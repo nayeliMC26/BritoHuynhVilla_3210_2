@@ -14,18 +14,16 @@ class Main {
         this.renderer.setClearColor(0x272727);
         document.body.appendChild(this.renderer.domElement);
         // setting the initial position of the camera, subject to change
-        this.camera.position.z = 35
+        this.camera.position.z = 200
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.camera);
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         // handles window resizing 
-        window.addEventListener('resize', () => this.onWindowResize, false)
+        window.addEventListener('resize', () => this.onWindowResize(), false)
     }
 
     animate() {
-        requestAnimationFrame(() => this.animate());
         this.renderer.render(this.scene, this.camera);
-        this.controls.update();
 
     }
     // defines the function of windowResizing
