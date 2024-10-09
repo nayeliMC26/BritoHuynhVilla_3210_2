@@ -16,7 +16,9 @@ document.body.appendChild(renderer.domElement);
 camera.position.z = 1000
 
 var customUniforms = {
-    delta: {value : 1}
+    deltaX: {value : 0},
+    deltaY: {value : 0},
+    deltaZ: {value : 0}
 }
 
 const geometry = new THREE.SphereGeometry(15, 32, 16);
@@ -30,8 +32,17 @@ const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
 function animate() {
-    sphere.material.uniforms.delta.value += 0.01;
+    drifting(sphere.material.uniforms)
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
-animate();
+
+function drifting(uniforms){
+    uniforms.deltaX.value += 0.01
+    uniforms.deltaY.value +=  uniforms.deltaY.value - Math.sin( uniforms.deltaX.value+1);
+    if (uniforms.deltaX.value < 1){
+        console.log("X: ", uniforms.deltaX.value)
+        console.log("Y: ", Math.sin(uniforms.deltaX.value))
+        console.log("")
+    }
+}
