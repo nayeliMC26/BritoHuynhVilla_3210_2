@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+import { ObjectManager } from './ObjectManager.js';
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
