@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ObjectManager } from './ObjectManager.js';
+
 class Main {
     constructor() {
         // adding scene, camera, renderer, making necessary adjustments
@@ -12,9 +14,10 @@ class Main {
         this.renderer.setClearColor(0x272727);
         document.body.appendChild(this.renderer.domElement);
         // setting the initial position of the camera, subject to change
-        this.camera.position.z = 400
+        this.camera.position.z = 35
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.camera);
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize, false)
     }
@@ -22,6 +25,7 @@ class Main {
     animate() {
         requestAnimationFrame(() => this.animate());
         this.renderer.render(this.scene, this.camera);
+        this.controls.update();
 
     }
     // defines the function of windowResizing
