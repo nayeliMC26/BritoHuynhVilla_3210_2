@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-
+import vertexShader from './shaders/vertexShaders';
+import fragmentShaders from './shaders/fragmentShaders';
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
