@@ -1,4 +1,4 @@
-import { IcosahedronGeometry } from "three";
+import * as THREE from 'three';
 
 export class ObjectManager{
     constructor(scene, camera){
