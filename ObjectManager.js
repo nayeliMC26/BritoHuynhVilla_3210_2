@@ -45,7 +45,7 @@ export class ObjectManager {
      */
     randomGeometries() {
         var geometries = [
-            new THREE.SphereGeometry(3, 16, 16),
+            new THREE.SphereGeometry(4, 16, 16),
             new THREE.BoxGeometry(4, 4, 4),
             new THREE.OctahedronGeometry(4, 0),
             new THREE.IcosahedronGeometry(4, 0)
@@ -65,7 +65,7 @@ export class ObjectManager {
             var objectRelocated = false;
             while (!objectRelocated) {
                 // create a new random position for them to move to 
-                var newPosition = new THREE.Vector3(Math.random() * 60 - 30, Math.random() * 60 - 30, Math.random() * 60 - 30);
+                var newPosition = new THREE.Vector3(Math.random() * 200 - 100, Math.random() * 60 - 30, Math.random() * 300 - 150);
                 // move each object to its new position
                 object.position.copy(newPosition);
                 // create a boundingBox for each object 
@@ -88,7 +88,5 @@ export class ObjectManager {
                 }
             }
         }
-
     }
-
 }
