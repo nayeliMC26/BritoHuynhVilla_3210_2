@@ -8,11 +8,10 @@ class Main {
         this.scene = new THREE.Scene();
         // Create the camera facing forward
         this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.xLookAt = 0;
         this.yLookAt = -100;
         this.zLookAt = 0;
-        // this.scene.add(this.camera);
+        this.camera.lookAt(new THREE.Vector3(this.xLookAt, this.yLookAt, this.zLookAt));
         
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -30,7 +29,7 @@ class Main {
     }
 
     animate() {
-        // Move the camera at a forward steady velocity (for now)
+        // Move the camera at a slow, forward steady velocity (for now)
         this.camera.position.set(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
         //this.camera.lookAt(new THREE.Vector3(this.xLookAt, this.yLookAt, this.zLookAt -= 0.1));
         this.renderer.render(this.scene, this.camera);
