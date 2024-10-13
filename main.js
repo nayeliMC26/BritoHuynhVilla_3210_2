@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import vertexS from './shaders/vertexShader';
-import fragmentS from './shaders/fragmentShader';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ObjectManager } from './ObjectManager.js';
@@ -29,22 +27,6 @@ class Main {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize(), false)
-
-        // custom uniforms for the vertex shader (change in x, y and z)
-        var customUniforms = {
-            deltaX: { value: 0 },
-            deltaY: { value: 0 },
-            deltaZ: { value: 0 }
-        }
-
-        const geometry = new THREE.SphereGeometry(15, 32, 16);
-        const material = new THREE.ShaderMaterial({
-            uniforms: customUniforms,
-            vertexShader: vertexS,
-            fragmentShader: fragmentS
-        });
-        this.sphere = new THREE.Mesh(geometry, material);
-        this.scene.add(this.sphere);
     }
 
     animate() {
@@ -54,7 +36,8 @@ class Main {
         this.camera.lookAt(0, this.yLookAt += 0.1, 0);
         this.renderer.render(this.scene, this.camera);
         this.controls.update();
-        this.drifting(this.sphere.material.uniforms);
+        //this.drifting(this.sphere.material.uniforms);
+        this.ObjectManager.drifting()
 
     }
     // defines the function of windowResizing
@@ -65,10 +48,7 @@ class Main {
     }
 
     // moves the shape input is teh shape uniforms
-    drifting(uniforms) {
-        uniforms.deltaX.value += 0.01
-        uniforms.deltaY.value += uniforms.deltaY.value - Math.sin(uniforms.deltaX.value + 1);
-    }
+    
 }
 
 var game = new Main();

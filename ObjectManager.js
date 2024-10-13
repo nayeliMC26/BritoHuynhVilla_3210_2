@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import vertexS from './shaders/vertexShader';
+import fragmentS from './shaders/fragmentShader';
+import { color } from 'three/webgpu';
 
 export class ObjectManager {
     constructor(scene, camera) {
@@ -32,7 +35,24 @@ export class ObjectManager {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
         // generate a random color for the material
-        var material = new THREE.MeshBasicMaterial({ color: new THREE.Color(Math.random(), Math.random(), Math.random()) });
+        var IDKdirectionX = (Math.random() - 0.5) / 10;
+        var IDKdirectionY = (Math.random() - 0.5) / 10;
+        var IDKdirectionZ = (Math.random() - 0.5) / 10;
+        var customUniforms = {
+            directionX: { value: IDKdirectionX },
+            directionY: { value: IDKdirectionY },
+            directionZ: { value: IDKdirectionZ },
+            deltaX: { value: IDKdirectionX },
+            deltaY: { value: IDKdirectionY },
+            deltaZ: { value: IDKdirectionZ },
+            color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
+        };
+        var material = new THREE.ShaderMaterial({
+            uniforms: customUniforms,
+            vertexShader: vertexS,
+            fragmentShader: fragmentS
+        });
+        //var material = new THREE.MeshBasicMaterial({ color: new THREE.Color(Math.random(), Math.random(), Math.random()) });
         // create a new mesh using the random shape and color
         var mesh = new THREE.Mesh(geometry, material);
         // return the mesh 
@@ -89,6 +109,17 @@ export class ObjectManager {
             }
         }
 
+    }
+
+    drifting() {
+        console.log("uni")
+        console.log(this.objects[0].material.uniforms.color.value.r)
+
+        this.objects.forEach(function (object) {
+            object.material.uniforms.directionX.value += object.material.uniforms.deltaX.value
+            object.material.uniforms.directionY.value += object.material.uniforms.deltaY.value
+            object.material.uniforms.directionZ.value += object.material.uniforms.deltaZ.value
+        });
     }
 
 }
