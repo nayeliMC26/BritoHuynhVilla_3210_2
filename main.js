@@ -70,7 +70,8 @@ class Main {
 
     }*/
 
-
+    // https://threejs.org/examples/webgl_multiple_views.html
+    // reference code 
     /*updateCamera(camera, scene, mouseX, mouseY) {
         camera.position.x += mouseX * 0.05;
         camera.position.x = Math.max(Math.min(camera.position.x, 700), - 700);

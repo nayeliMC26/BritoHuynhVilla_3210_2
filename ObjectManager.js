@@ -45,16 +45,17 @@ export class ObjectManager {
      */
     randomGeometries() {
         var geometries = [
-            new THREE.SphereGeometry(THREE.MathUtils.randInt(2,7), 32, 32),
-            new THREE.OctahedronGeometry(THREE.MathUtils.randInt(2,7), 0),
-            new THREE.IcosahedronGeometry(THREE.MathUtils.randInt(2,7), 0)
+            new THREE.SphereGeometry(THREE.MathUtils.randInt(2, 7), 32, 32),
+            new THREE.OctahedronGeometry(THREE.MathUtils.randInt(2, 7), 0),
+            new THREE.IcosahedronGeometry(THREE.MathUtils.randInt(2, 7), 0)
         ]
         /** for the length of the array of geometry types, pick a random number from there and return the number at that index 
          * this may have to be tweaked later but for now its fine 
         */
         return geometries[Math.floor(Math.random() * geometries.length)]
     }
-
+    // https://discourse.threejs.org/t/space-background/49885
+    // source for this code which will be used temporarily 
     renderStars() {
         // -- space background ------------------------------------------------------
         for (var i = 0; i < 10000; i++) {  // Adjust the number of stars if needed
