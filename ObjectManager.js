@@ -3,9 +3,9 @@ import vertexS from './shaders/vertexShader';
 import fragmentS from './shaders/fragmentShader';
 
 export class ObjectManager {
-    constructor(scene, camera) {
+    constructor(scene) {
         this.scene = scene;
-        this.camera = camera;
+        // this.camera = camera;
         this.objects = [];
         // number of objects that will get generated 
         this.objectsMax = 20;
