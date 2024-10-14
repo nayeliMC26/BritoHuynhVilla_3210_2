@@ -7,15 +7,10 @@ export class ObjectManager {
         this.scene = scene;
         this.camera = camera;
         this.objects = [];
-        this.helpers = [];
         // number of objects that will get generated 
         this.objectsMax = 20;
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
-        for (var i = 0; i < this.helpers.length; i++) {
-            this.helpers[i].updateMatrixWorld(true);
-        };
-
     }
     // function which just creates our object pool which we will be reusing
     createObjectPool() {
@@ -25,7 +20,6 @@ export class ObjectManager {
             var randomObject = this.createRandomObject();
             // create a bounding box to handle collisions
             randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject);
-            console.log("random: ", randomObject.boundingBox);
             // add objects to the objectPool
             this.objects.push(randomObject)
             this.scene.add(randomObject)
@@ -82,7 +76,6 @@ export class ObjectManager {
                 object.position.copy(newPosition);
                 // create a boundingBox for each object 
                 object.boundingBox.setFromObject(object);
-                console.log("bouding: ", object.boundingBox);
 
                 var collision = false;
                 for (var j = 0; j < objects.length; j++) {
@@ -101,26 +94,28 @@ export class ObjectManager {
                 }
             }
         }
-
     }
 
     // generates random uniform values
     randomUniforms() {
         var uniform = {
+            // The differnece in coordinates
             deltaX: { value: 0 },
             deltaY: { value: 0 },
             deltaZ: { value: 0 },
-            directionX: { value: (Math.random() - 0.5) / 10 },
-            directionY: { value: (Math.random() - 0.5) / 10 },
-            directionZ: { value: (Math.random() - 0.5) / 10 },
+            // The direction and speed that the shape will move on the axis
+            directionX: { value: (Math.random() - 0.5) / 33 },
+            directionY: { value: (Math.random() - 0.5) / 33 },
+            directionZ: { value: (Math.random() - 0.5) / 33 },
+            // The color of the shape
             color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
         };
-
         return uniform;
     }
 
-    // moves the shapes
+    // Moves the shape in a linear direction
     drifting() {
+        // For all the objects in the object pool
         this.objects.forEach(function (object) {
             object.material.uniforms.deltaX.value += object.material.uniforms.directionX.value;
             object.material.uniforms.deltaY.value += object.material.uniforms.directionY.value;

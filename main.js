@@ -31,23 +31,22 @@ class Main {
 
     animate() {
         // Move the camera at a slow, forward steady velocity (for now)
-        //this.camera.position.set(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
+        this.camera.position.set(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
         //this.camera.lookAt(new THREE.Vector3(this.xLookAt, this.yLookAt, this.zLookAt -= 0.1));
-        //this.camera.lookAt(0, this.yLookAt += 0.1, 0);
+        this.camera.lookAt(0, this.yLookAt += 0.1, 0);
         this.renderer.render(this.scene, this.camera);
         this.controls.update();
-        //this.ObjectManager.drifting()
+        // moves all the objects in a linear direction
+        this.ObjectManager.drifting()
 
     }
+
     // defines the function of windowResizing
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    // moves the shape input is teh shape uniforms
-    
+    }    
 }
 
 var game = new Main();

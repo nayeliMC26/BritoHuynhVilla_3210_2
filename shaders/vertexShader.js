@@ -6,10 +6,12 @@ uniform float directionX;
 uniform float directionY;
 uniform float directionZ;
 uniform vec3 color;
-out vec3 dColor;
+
+// Variable that will be passed to the fragment shader
+out vec3 fColor;
 
 void main() {
-    dColor = color;
+    fColor = color;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x + deltaX, position.y + deltaY, position.z + deltaZ, 1.0); 
 }
 `;
