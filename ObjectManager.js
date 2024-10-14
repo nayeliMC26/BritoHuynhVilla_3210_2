@@ -1,17 +1,20 @@
 import * as THREE from 'three';
 import vertexS from './shaders/vertexShader';
 import fragmentS from './shaders/fragmentShader';
-import { color } from 'three/webgpu';
 
 export class ObjectManager {
     constructor(scene, camera) {
         this.scene = scene;
         this.camera = camera;
         this.objects = [];
+        this.helpers = [];
         // number of objects that will get generated 
         this.objectsMax = 20;
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
+        for (var i = 0; i < this.helpers.length; i++) {
+            this.helpers[i].updateMatrixWorld(true);
+        };
 
     }
     // function which just creates our object pool which we will be reusing
@@ -22,6 +25,7 @@ export class ObjectManager {
             var randomObject = this.createRandomObject();
             // create a bounding box to handle collisions
             randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject);
+            console.log("random: ", randomObject.boundingBox);
             // add objects to the objectPool
             this.objects.push(randomObject)
             this.scene.add(randomObject)
@@ -34,26 +38,14 @@ export class ObjectManager {
     createRandomObject() {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
-        // generate a random color for the material
-        var IDKdirectionX = (Math.random() - 0.5) / 10;
-        var IDKdirectionY = (Math.random() - 0.5) / 10;
-        var IDKdirectionZ = (Math.random() - 0.5) / 10;
-        var customUniforms = {
-            directionX: { value: IDKdirectionX },
-            directionY: { value: IDKdirectionY },
-            directionZ: { value: IDKdirectionZ },
-            deltaX: { value: IDKdirectionX },
-            deltaY: { value: IDKdirectionY },
-            deltaZ: { value: IDKdirectionZ },
-            color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
-        };
+        // generate a material with random uniform values
+        var customUniforms = this.randomUniforms();
         var material = new THREE.ShaderMaterial({
             uniforms: customUniforms,
             vertexShader: vertexS,
             fragmentShader: fragmentS
         });
-        //var material = new THREE.MeshBasicMaterial({ color: new THREE.Color(Math.random(), Math.random(), Math.random()) });
-        // create a new mesh using the random shape and color
+        // create a new mesh using the random shape and material
         var mesh = new THREE.Mesh(geometry, material);
         // return the mesh 
         return mesh;
@@ -90,6 +82,7 @@ export class ObjectManager {
                 object.position.copy(newPosition);
                 // create a boundingBox for each object 
                 object.boundingBox.setFromObject(object);
+                console.log("bouding: ", object.boundingBox);
 
                 var collision = false;
                 for (var j = 0; j < objects.length; j++) {
@@ -111,14 +104,27 @@ export class ObjectManager {
 
     }
 
-    drifting() {
-        console.log("uni")
-        console.log(this.objects[0].material.uniforms.color.value.r)
+    // generates random uniform values
+    randomUniforms() {
+        var uniform = {
+            deltaX: { value: 0 },
+            deltaY: { value: 0 },
+            deltaZ: { value: 0 },
+            directionX: { value: (Math.random() - 0.5) / 10 },
+            directionY: { value: (Math.random() - 0.5) / 10 },
+            directionZ: { value: (Math.random() - 0.5) / 10 },
+            color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
+        };
 
+        return uniform;
+    }
+
+    // moves the shapes
+    drifting() {
         this.objects.forEach(function (object) {
-            object.material.uniforms.directionX.value += object.material.uniforms.deltaX.value
-            object.material.uniforms.directionY.value += object.material.uniforms.deltaY.value
-            object.material.uniforms.directionZ.value += object.material.uniforms.deltaZ.value
+            object.material.uniforms.deltaX.value += object.material.uniforms.directionX.value;
+            object.material.uniforms.deltaY.value += object.material.uniforms.directionY.value;
+            object.material.uniforms.deltaZ.value += object.material.uniforms.directionZ.value;
         });
     }
 

@@ -1,14 +1,16 @@
 const vertex = /* glsl */ `
-uniform float directionX;
-uniform float directionY;
-uniform float directionZ;
 uniform float deltaX;
 uniform float deltaY;
 uniform float deltaZ;
-out vec3 color;
+uniform float directionX;
+uniform float directionY;
+uniform float directionZ;
+uniform vec3 color;
+out vec3 dColor;
 
 void main() {
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x + directionX, position.y + directionY, position.z + directionZ, 1.0); 
+    dColor = color;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x + deltaX, position.y + deltaY, position.z + deltaZ, 1.0); 
 }
 `;
 export default vertex;
