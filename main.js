@@ -37,7 +37,9 @@ class Main {
         this.renderer.render(this.scene, this.camera);
         this.controls.update();
         // moves all the objects in a linear direction
-        this.ObjectManager.drifting()
+        this.ObjectManager.drifting();
+        // Enable blending
+        this.ObjectManager.blend();
 
     }
 

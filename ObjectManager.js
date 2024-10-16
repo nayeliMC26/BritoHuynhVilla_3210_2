@@ -128,8 +128,8 @@ export class ObjectManager {
         this.objects.forEach(function (object) {
             object.material.blending = THREE.CustomBlending;
             object.material.blendEquation = THREE.AddEquation; //default 
-            object.material.blendSrc = THREE.SrcAlphaFactor;  //default 
-            object.material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+            object.material.blendSrc = THREE.SrcColorFactor;
+            object.material.blendDst = THREE.OneMinusSrcColorFactor;
         });
     }
 
