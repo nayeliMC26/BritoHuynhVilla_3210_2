@@ -3,9 +3,9 @@ import vertexS from './shaders/vertexShader';
 import fragmentS from './shaders/fragmentShader';
 
 export class ObjectManager {
-    constructor(scene) {
+    constructor(scene, camera) {
         this.scene = scene;
-        // this.camera = camera;
+        this.camera = camera;
         this.objects = [];
         // number of objects that will get generated 
         this.objectsMax = 20;
@@ -104,9 +104,9 @@ export class ObjectManager {
             deltaY: { value: 0 },
             deltaZ: { value: 0 },
             // The direction and speed that the shape will move on the axis
-            directionX: { value: (Math.random() - 0.5) / 33 },
-            directionY: { value: (Math.random() - 0.5) / 33 },
-            directionZ: { value: (Math.random() - 0.5) / 33 },
+            directionX: { value: (Math.random() - 0.5) / 5 },
+            directionY: { value: (Math.random() - 0.5) / 5 },
+            directionZ: { value: (Math.random() - 0.5) / 5 },
             // The color of the shape
             color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
         };
