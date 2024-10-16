@@ -84,7 +84,9 @@ class Main {
         }
 
         // Moves all the objects in a random linear direction
-        this.ObjectManager.drifting()
+        this.ObjectManager.drifting();
+        // Enable blending
+        this.ObjectManager.blend();
 
     }
 

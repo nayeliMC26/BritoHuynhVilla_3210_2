@@ -123,4 +123,14 @@ export class ObjectManager {
         });
     }
 
+    /** Add blending for the objects */
+    blend() {
+        this.objects.forEach(function (object) {
+            object.material.blending = THREE.CustomBlending;
+            object.material.blendEquation = THREE.AddEquation; //default 
+            object.material.blendSrc = THREE.SrcColorFactor;
+            object.material.blendDst = THREE.OneMinusSrcColorFactor;
+        });
+    }
+
 }
