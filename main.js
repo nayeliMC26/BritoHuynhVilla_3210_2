@@ -50,6 +50,8 @@ class Main {
         this.renderer.setAnimationLoop(() => this.animate());
         document.body.appendChild(this.renderer.domElement);
 
+        this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
         // handles window resizing 
@@ -59,6 +61,7 @@ class Main {
     }
 
     animate() {
+        this.controls.update();
         // Move the camera at a slow, forward steady velocity (for now)
         for (let i = 0; i < this.views.length; i++) {
             // Picking a camera to work with
@@ -78,13 +81,14 @@ class Main {
 
 
             // Updating the camera and renderer
-            camera.position.z -= 0.5;
-            camera.lookAt.z -= 0.5;
+            // camera.position.z -= 0.5;
+            // camera.lookAt.z -= 0.5;
             this.renderer.render(this.scene, camera);
         }
 
         // Moves all the objects in a random linear direction
-        this.ObjectManager.drifting()
+        // this.ObjectManager.drifting();
+        this.ObjectManager.transformations();
 
     }
 
