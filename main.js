@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ObjectManager } from './ObjectManager.js';
-import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 
 class Main {
     constructor() {
@@ -51,45 +50,11 @@ class Main {
         this.directionalLight.shadow.camera.near = 1;
         this.directionalLight.shadow.camera.far = 500;
 
-        //this.mouseX = 0;
-        //this.mouseY = 0;
-        //this.movementSpeed = 1;
-
-        //document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this));
-
-        this.firstPersonControls = new FirstPersonControls(this.camera, this.renderer.domElement)
-        this.firstPersonControls.movementSpeed = 25;
-        this.firstPersonControls.lookSpeed = 0.01;
-
     }
 
-    /*onDocumentMouseMove(event) {
-
-        this.mouseX = (event.clientX - window.innerWidth / 2);
-        this.mouseY = (event.clientY - window.innerHeight / 2);
-
-    }*/
-
-    // https://threejs.org/examples/webgl_multiple_views.html
-    // reference code 
-    /*updateCamera(camera, scene, mouseX, mouseY) {
-        camera.position.x += mouseX * 0.05;
-        camera.position.x = Math.max(Math.min(camera.position.x, 700), - 700);
-        //camera.lookAt(scene.position);
-
-        camera.position.y += mouseY * 0.05;
-        camera.position.y = Math.max(Math.min(camera.position.y, 700), - 700);
-        //camera.lookAt(scene.position);
-
-
-    }*/
-
-
     animate() {
-        //this.camera.position.set(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
-        //this.camera.lookAt(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
-        this.firstPersonControls.update(0.1)
-        //this.updateCamera(this.camera, this.scene, this.mouseX, this.mouseY)
+        this.camera.position.set(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
+        this.camera.lookAt(this.xLookAt, this.yLookAt += 0.1, this.zLookAt);
         this.renderer.render(this.scene, this.camera);
 
 
