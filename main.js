@@ -55,11 +55,12 @@ class Main {
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize(), false)
 
-
+        // Used to calculate delta time
+        this.clock = new THREE.Clock();
     }
 
     animate() {
-        // Move the camera at a slow, forward steady velocity (for now)
+        // Move the camera at a slow, forward steady velocity using delta time
         for (let i = 0; i < this.views.length; i++) {
             // Picking a camera to work with
             const view = this.views[i];
@@ -78,8 +79,10 @@ class Main {
 
 
             // Updating the camera and renderer
-            camera.position.z -= 0.5;
-            camera.lookAt.z -= 0.5;
+            const deltaTime = this.clock.getDelta();
+            const speed = 20;
+            camera.position.z -= (deltaTime * speed);
+            camera.lookAt.z -= (deltaTime * speed);
             this.renderer.render(this.scene, camera);
         }
 
@@ -87,7 +90,6 @@ class Main {
         this.ObjectManager.drifting();
         // Enable blending
         this.ObjectManager.blend();
-
     }
 
     // defines the function of windowResizing
