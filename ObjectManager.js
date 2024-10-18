@@ -32,9 +32,6 @@ export class ObjectManager {
     createRandomObject() {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
-        // generate a random color for the material
-        var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(Math.random(), Math.random(), Math.random()) });
-        // create a new mesh using the random shape and color
         // generate a material with random uniform values
         var customUniforms = this.randomUniforms();
         var material = new THREE.ShaderMaterial({
