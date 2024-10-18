@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import vertexS from './shaders/vertexShader';
+import fragmentS from './shaders/fragmentShader';
 
 export class ObjectManager {
     constructor(scene, camera) {
@@ -9,7 +11,6 @@ export class ObjectManager {
         this.objectsMax = 200;
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
-
     }
     // function which just creates our object pool which we will be reusing
     createObjectPool() {
@@ -34,6 +35,14 @@ export class ObjectManager {
         // generate a random color for the material
         var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(Math.random(), Math.random(), Math.random()) });
         // create a new mesh using the random shape and color
+        // generate a material with random uniform values
+        var customUniforms = this.randomUniforms();
+        var material = new THREE.ShaderMaterial({
+            uniforms: customUniforms,
+            vertexShader: vertexS,
+            fragmentShader: fragmentS
+        });
+        // create a new mesh using the random shape and material
         var mesh = new THREE.Mesh(geometry, material);
         // return the mesh 
         return mesh;
@@ -112,5 +121,42 @@ export class ObjectManager {
                 }
             }
         }
+    }
+
+    // generates random uniform values
+    randomUniforms() {
+        var uniform = {
+            // The differnece in coordinates
+            deltaX: { value: 0 },
+            deltaY: { value: 0 },
+            deltaZ: { value: 0 },
+            // The direction and speed that the shape will move on the axis
+            directionX: { value: (Math.random() - 0.5) / 5 },
+            directionY: { value: (Math.random() - 0.5) / 5 },
+            directionZ: { value: (Math.random() - 0.5) / 5 },
+            // The color of the shape
+            color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
+        };
+        return uniform;
+    }
+
+    // Moves the shape in a linear direction
+    drifting() {
+        // For all the objects in the object pool
+        this.objects.forEach(function (object) {
+            object.material.uniforms.deltaX.value += object.material.uniforms.directionX.value;
+            object.material.uniforms.deltaY.value += object.material.uniforms.directionY.value;
+            object.material.uniforms.deltaZ.value += object.material.uniforms.directionZ.value;
+        });
+    }
+
+    /** Add blending for the objects */
+    blend() {
+        this.objects.forEach(function (object) {
+            object.material.blending = THREE.CustomBlending;
+            object.material.blendEquation = THREE.AddEquation; //default 
+            object.material.blendSrc = THREE.SrcColorFactor;
+            object.material.blendDst = THREE.OneMinusSrcColorFactor;
+        });
     }
 }
