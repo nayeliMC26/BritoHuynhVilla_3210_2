@@ -8,6 +8,7 @@ class Main {
         // adding scene, camera, renderer, making necessary adjustments
         this.scene = new THREE.Scene();
 
+
         // Object with the required information for each camera
         this.views = [
             {
@@ -48,6 +49,10 @@ class Main {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.animate());
+              // nice gray color to start with :)
+        this.renderer.setClearColor(0x272727);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
         // creating a new objectManager object 
@@ -57,6 +62,25 @@ class Main {
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
+      
+      
+        this.ObjectManager.renderStars();
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        this.scene.add(this.ambientLight);
+
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        this.directionalLight.position.set(50, -200, 0);
+        this.directionalLight.castShadow = true;
+        this.scene.add(this.directionalLight);
+        this.helper = new THREE.CameraHelper(this.directionalLight.shadow.camera);
+        //this.scene.add(this.helper);
+
+        this.directionalLight.shadow.camera.left = -200;
+        this.directionalLight.shadow.camera.right = 200;
+        this.directionalLight.shadow.camera.top = 200;
+        this.directionalLight.shadow.camera.bottom = -200;
+        this.directionalLight.shadow.camera.near = 1;
+        this.directionalLight.shadow.camera.far = 500;
     }
 
     animate() {
