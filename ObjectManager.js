@@ -9,7 +9,7 @@ export class ObjectManager {
         this.objects = [];
         this.scaleFactors = [];
         // number of objects that will get generated 
-        this.objectsMax = 1;
+        this.objectsMax = 20;
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
     }
@@ -35,6 +35,9 @@ export class ObjectManager {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
         var material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() });
+        var shape = new THREE.Mesh(geometry, material);
+        shape.castShadow = true; //default is false
+        shape.receiveShadow = true; //default
         switch (Math.floor(Math.random() * 2)) {
             case 0:
                 var scaleStart = 2 * Math.PI;
@@ -44,10 +47,10 @@ export class ObjectManager {
                 break;
         }
         var object = {
-            mesh: new THREE.Mesh(geometry, material),
-            deltaX: (Math.random() - 0.5) / 5,
-            deltaY: (Math.random() - 0.5) / 5,
-            deltaZ: (Math.random() - 0.5) / 5,
+            mesh: shape,
+            deltaX: (Math.random() - 0.5) / 10,
+            deltaY: (Math.random() - 0.5) / 10,
+            deltaZ: (Math.random() - 0.5) / 10,
             scaleOrigin: scaleStart,
             deltaSX: scaleStart,
             deltaSY: scaleStart,
@@ -139,11 +142,9 @@ export class ObjectManager {
     }
 
     transformations() {
-        for (var i = 0; i < this.objects.length; i++) {
-            // The object we're working with
-            var object = this.objects[i];
-            // The last scale factor that was applied to the object 
-            var scaleFactor = this.scaleFactors[i];
+        this.objects.forEach(function (object) {
+            // The scale factor that was applied to the object 
+            var scaleFactor = object.mesh.scale;
             // Make a copy of the object's original position
             var position = new THREE.Vector3().copy(object.mesh.position)
             // Moving object to origing for easier scaling
@@ -152,7 +153,7 @@ export class ObjectManager {
             // Making scaler matrix
             var matrix = new THREE.Matrix4();
             // Reverting object to the original size
-            matrix.makeScale(1 / scaleFactor[0], 1 / scaleFactor[1], 1 / scaleFactor[2]);
+            matrix.makeScale(1 / scaleFactor.x, 1 / scaleFactor.y, 1 / scaleFactor.z);
             object.mesh.applyMatrix4(matrix);
 
             // Getting new scale value
@@ -167,17 +168,8 @@ export class ObjectManager {
             matrix.makeScale(scaleX, scaleY, scaleZ);
             object.mesh.applyMatrix4(matrix);
 
-            // Updating the last scale factor that was applied to the object
-            this.scaleFactors[i] = [scaleX, scaleY, scaleZ];
-
             // Moving object back to it's original position
             object.mesh.position.copy(position);
-        }
+        });
     }
-
-    getReverseScale(scale) {
-
-    }
-
-
 }
