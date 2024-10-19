@@ -9,7 +9,7 @@ export class ObjectManager {
         this.objects = [];
         this.scaleFactors = [];
         // number of objects that will get generated 
-        this.objectsMax = 20;
+        this.objectsMax = 200;
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
     }
@@ -68,16 +68,40 @@ export class ObjectManager {
      */
     randomGeometries() {
         var geometries = [
-            new THREE.SphereGeometry(3, 16, 16),
-            new THREE.BoxGeometry(4, 4, 4),
-            new THREE.OctahedronGeometry(4, 0),
-            new THREE.IcosahedronGeometry(4, 0)
+            new THREE.SphereGeometry(THREE.MathUtils.randInt(2, 7), 32, 32),
+            new THREE.OctahedronGeometry(THREE.MathUtils.randInt(2, 7), 0),
+            new THREE.IcosahedronGeometry(THREE.MathUtils.randInt(2, 7), 0)
         ]
         /** for the length of the array of geometry types, pick a random number from there and return the number at that index 
          * this may have to be tweaked later but for now its fine 
         */
         return geometries[Math.floor(Math.random() * geometries.length)]
     }
+    // https://discourse.threejs.org/t/space-background/49885
+    // source for this code which will be used temporarily 
+    renderStars() {
+        // -- space background ------------------------------------------------------
+        for (var i = 0; i < 10000; i++) {  // Adjust the number of stars if needed
+            let x = THREE.MathUtils.randFloatSpread(2000); // random position for x-axis
+            let y = THREE.MathUtils.randFloatSpread(2000); // random position for y-axis
+            let z = THREE.MathUtils.randFloatSpread(2000); // random position for z-axis
+
+            var starGeometry = new THREE.OctahedronGeometry(0.5, 0);
+
+            // Create a material for each star (basic color, can be customized)
+            var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+            // Create a mesh by combining the geometry and material
+            var star = new THREE.Mesh(starGeometry, starMaterial);
+
+            // Set the position of the star randomly in 3D space
+            star.position.set(x, y, z);
+
+            // Add the star to the scene
+            this.scene.add(star);
+        }
+    }
+
 
     // function to "spawn" the objects with a random location without intersecting 
     randomPosition(objects) {
@@ -88,7 +112,7 @@ export class ObjectManager {
             var objectRelocated = false;
             while (!objectRelocated) {
                 // create a new random position for them to move to 
-                var newPosition = new THREE.Vector3(Math.random() * 60 - 30, Math.random() * 60 - 30, Math.random() * 60 - 30);
+                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(600), THREE.MathUtils.randFloatSpread(600), THREE.MathUtils.randFloatSpread(600));
                 // move each object to its new position
                 object.position.copy(newPosition);
                 // create a boundingBox for each object 
@@ -141,6 +165,7 @@ export class ObjectManager {
 
     }
 
+
     transformations() {
         this.objects.forEach(function (object) {
             // The scale factor that was applied to the object 
@@ -173,3 +198,15 @@ export class ObjectManager {
         });
     }
 }
+
+    /** Add blending for the objects */
+    blend() {
+        this.objects.forEach(function (object) {
+            object.material.blending = THREE.CustomBlending;
+            object.material.blendEquation = THREE.AddEquation; //default 
+            object.material.blendSrc = THREE.SrcColorFactor;
+            object.material.blendDst = THREE.OneMinusSrcColorFactor;
+        });
+    }
+}
+
