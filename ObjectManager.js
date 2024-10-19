@@ -34,7 +34,7 @@ export class ObjectManager {
     createRandomObject() {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
-        var material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() });
+        var material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
         var shape = new THREE.Mesh(geometry, material);
         shape.castShadow = true; //default is false
         shape.receiveShadow = true; //default
@@ -112,7 +112,7 @@ export class ObjectManager {
             var objectRelocated = false;
             while (!objectRelocated) {
                 // create a new random position for them to move to 
-                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(600), THREE.MathUtils.randFloatSpread(600), THREE.MathUtils.randFloatSpread(600));
+                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200));
                 // move each object to its new position
                 object.position.copy(newPosition);
                 // create a boundingBox for each object 
@@ -197,15 +197,15 @@ export class ObjectManager {
             object.mesh.position.copy(position);
         });
     }
-}
+
 
     /** Add blending for the objects */
     blend() {
         this.objects.forEach(function (object) {
-            object.material.blending = THREE.CustomBlending;
-            object.material.blendEquation = THREE.AddEquation; //default 
-            object.material.blendSrc = THREE.SrcColorFactor;
-            object.material.blendDst = THREE.OneMinusSrcColorFactor;
+            object.mesh.material.blending = THREE.CustomBlending;
+            object.mesh.material.blendEquation = THREE.AddEquation; //default 
+            object.mesh.material.blendSrc = THREE.SrcColorFactor;
+            object.mesh.material.blendDst = THREE.OneMinusSrcColorFactor;
         });
     }
 }
