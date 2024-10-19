@@ -7,6 +7,7 @@ export class ObjectManager {
         this.scene = scene;
         this.camera = camera;
         this.objects = [];
+        this.scaleFactors = [];
         // number of objects that will get generated 
         this.objectsMax = 200;
         // call our createObjectPool function to create an objectPool 
@@ -19,10 +20,11 @@ export class ObjectManager {
             // create random meshes using random geometry and random material 
             var randomObject = this.createRandomObject();
             // create a bounding box to handle collisions
-            randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject);
+            // randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject);
             // add objects to the objectPool
-            this.objects.push(randomObject)
-            this.scene.add(randomObject)
+            this.objects.push(randomObject);
+            this.scaleFactors.push([1, 1, 1]);
+            this.scene.add(randomObject.mesh);
         }
         //callthe random position function our list of objects
         this.randomPosition(this.objects)
@@ -32,17 +34,32 @@ export class ObjectManager {
     createRandomObject() {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
-        // generate a material with random uniform values
-        var customUniforms = this.randomUniforms();
-        var material = new THREE.ShaderMaterial({
-            uniforms: customUniforms,
-            vertexShader: vertexS,
-            fragmentShader: fragmentS
-        });
-        // create a new mesh using the random shape and material
-        var mesh = new THREE.Mesh(geometry, material);
-        // return the mesh 
-        return mesh;
+        var material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() });
+        var shape = new THREE.Mesh(geometry, material);
+        shape.castShadow = true; //default is false
+        shape.receiveShadow = true; //default
+        switch (Math.floor(Math.random() * 2)) {
+            case 0:
+                var scaleStart = 2 * Math.PI;
+                break;
+            case 1:
+                var scaleStart = Math.PI;
+                break;
+        }
+        var object = {
+            mesh: shape,
+            deltaX: (Math.random() - 0.5) / 10,
+            deltaY: (Math.random() - 0.5) / 10,
+            deltaZ: (Math.random() - 0.5) / 10,
+            scaleOrigin: scaleStart,
+            deltaSX: scaleStart,
+            deltaSY: scaleStart,
+            deltaSZ: scaleStart
+            // scaleSpeed: (Math.random() - 0.5) / 10
+            // scaleSpeed: (Math.random() - 0.5) / 10
+            // scaleSpeed: (Math.random() - 0.5) / 10
+        }
+        return object
     }
 
     // function which is just a list of geometries and randomly returns a geometry 
@@ -90,7 +107,7 @@ export class ObjectManager {
     randomPosition(objects) {
         // for every object in the array of random objects made 
         for (var i = 0; i < objects.length; i++) {
-            var object = objects[i];
+            var object = objects[i].mesh;
             // start with the object not being relocated, so at 0,0,0
             var objectRelocated = false;
             while (!objectRelocated) {
@@ -99,17 +116,17 @@ export class ObjectManager {
                 // move each object to its new position
                 object.position.copy(newPosition);
                 // create a boundingBox for each object 
-                object.boundingBox.setFromObject(object);
+                // object.boundingBox.setFromObject(object);
 
                 var collision = false;
                 for (var j = 0; j < objects.length; j++) {
                     if (i !== j) {
                         // so long as two objects are not the same check if they are intersecting
-                        if (object.boundingBox.intersectsBox(objects[j].boundingBox)) {
-                            // if they intersect then they are colliding
-                            collision = true;
-                            break;
-                        }
+                        // if (object.boundingBox.intersectsBox(objects[j].boundingBox)) {
+                        //     // if they intersect then they are colliding
+                        //     collision = true;
+                        //     break;
+                        // }
                     }
                 }
                 // if they are colliding they should not relocate until they are NOT colliding
@@ -141,11 +158,46 @@ export class ObjectManager {
     drifting() {
         // For all the objects in the object pool
         this.objects.forEach(function (object) {
-            object.material.uniforms.deltaX.value += object.material.uniforms.directionX.value;
-            object.material.uniforms.deltaY.value += object.material.uniforms.directionY.value;
-            object.material.uniforms.deltaZ.value += object.material.uniforms.directionZ.value;
+            object.mesh.translateX(object.deltaX);
+            object.mesh.translateY(object.deltaY);
+            object.mesh.translateZ(object.deltaZ);
+        });
+
+    }
+
+
+    transformations() {
+        this.objects.forEach(function (object) {
+            // The scale factor that was applied to the object 
+            var scaleFactor = object.mesh.scale;
+            // Make a copy of the object's original position
+            var position = new THREE.Vector3().copy(object.mesh.position)
+            // Moving object to origing for easier scaling
+            object.mesh.position.copy(new THREE.Vector3(0, 0, 0));
+
+            // Making scaler matrix
+            var matrix = new THREE.Matrix4();
+            // Reverting object to the original size
+            matrix.makeScale(1 / scaleFactor.x, 1 / scaleFactor.y, 1 / scaleFactor.z);
+            object.mesh.applyMatrix4(matrix);
+
+            // Getting new scale value
+            object.deltaSX += object.deltaX;
+            object.deltaSY += object.deltaY;
+            object.deltaSX += object.deltaX;
+            var scaleX = 1 + (Math.sin(object.deltaSX) / 2);
+            var scaleY = 1 + (Math.sin(object.deltaSY) / 2);
+            var scaleZ = 1 + (Math.sin(object.deltaSZ) / 2);
+
+            // Applying new scale
+            matrix.makeScale(scaleX, scaleY, scaleZ);
+            object.mesh.applyMatrix4(matrix);
+
+            // Moving object back to it's original position
+            object.mesh.position.copy(position);
         });
     }
+}
 
     /** Add blending for the objects */
     blend() {
@@ -157,3 +209,4 @@ export class ObjectManager {
         });
     }
 }
+

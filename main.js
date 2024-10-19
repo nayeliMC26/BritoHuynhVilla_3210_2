@@ -14,7 +14,7 @@ class Main {
             {
                 camera: "",
                 eye: new THREE.Vector3(0, 0, 200), // location
-                lookAt: new THREE.Vector3(0, 0, 0),
+                lookAt: new THREE.Vector3(0, 0, -1),
                 // The parameters of the view port (percetages of the screen)
                 left: 0,
                 bottom: 0,
@@ -25,7 +25,7 @@ class Main {
             {
                 camera: "",
                 eye: new THREE.Vector3(0, 0, 200), // location
-                lookAt: new THREE.Vector3(0, 0, 400),
+                lookAt: new THREE.Vector3(0, 0, 1),
                 // The parameters of the view port (percetages of the screen)
                 left: 0.2,
                 bottom: 0.75,
@@ -55,9 +55,11 @@ class Main {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
+        this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
         // handles window resizing 
+
         window.addEventListener('resize', () => this.onWindowResize(), false)
 
         // Used to calculate delta time
@@ -107,13 +109,18 @@ class Main {
             const speed = 20;
             camera.position.z -= (deltaTime * speed);
             camera.lookAt.z -= (deltaTime * speed);
+
             this.renderer.render(this.scene, camera);
         }
 
         // Moves all the objects in a random linear direction
         this.ObjectManager.drifting();
+
+        this.ObjectManager.transformations();
+
         // Enable blending
         this.ObjectManager.blend();
+
     }
 
     // defines the function of windowResizing
