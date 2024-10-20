@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ObjectManager } from './ObjectManager.js';
+import { FirstPersonControls } from './controls/FirstPersonControls.js';
 
 class Main {
     constructor() {
@@ -110,8 +109,8 @@ class Main {
             // Updating the camera and renderer
             const deltaTime = this.clock.getDelta();
             const speed = 20;
-            camera.position.z -= (deltaTime * speed);
-            camera.lookAt.z -= (deltaTime * speed);
+            // camera.position.z -= (deltaTime * speed);
+            // camera.lookAt.z -= (deltaTime * speed);
 
             this.controls.update(deltaTime * speed);
             this.renderer.render(this.scene, camera);
