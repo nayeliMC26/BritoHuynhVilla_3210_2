@@ -8,12 +8,22 @@ class Main {
         // adding scene, camera, renderer, making necessary adjustments
         this.scene = new THREE.Scene();
 
+        // Setting up the renderer
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setAnimationLoop(() => this.animate());
+        // nice gray color to start with :)
+        this.renderer.setClearColor(0x272727);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(this.renderer.domElement);
+
+        // Group to act as the body of the cameras
 
         // Object with the required information for each camera
         this.views = [
             {
                 camera: "",
-                eye: new THREE.Vector3(0, 0, 200), // location
                 lookAt: new THREE.Vector3(0, 0, -1),
                 // The parameters of the view port (percetages of the screen)
                 left: 0,
@@ -24,38 +34,54 @@ class Main {
             },
             {
                 camera: "",
-                eye: new THREE.Vector3(0, 0, 200), // location
                 lookAt: new THREE.Vector3(0, 0, 1),
                 // The parameters of the view port (percetages of the screen)
                 left: 0.2,
                 bottom: 0.75,
-                width: (window.innerWidth - (window.innerWidth * 0.4)) / window.innerWidth,
-                height: (window.innerHeight - (window.innerHeight * 0.8)) / window.innerHeight,
+                width: 0.6,
+                height: 0.2,
                 background: 0x808080
             }
         ];
+        this.cameraBody = new THREE.Group();
+        this.cameraBody.rotateY(Math.PI);
+        this.cameraBody.position.set(-10, 0, 50);
 
+
+        this.scene.add(this.cameraBody);
         // Creating the cameras
         for (let i = 0; i < this.views.length; i++) {
             const view = this.views[i];
             const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
             camera.lookAt(view.lookAt);
-            camera.position.copy(view.eye);
-            this.scene.add(camera);
+            // camera.position.copy(view.eye);
             view.camera = camera;
+            this.scene.add(camera);
+            this.cameraBody.add(view.camera);
         }
+        // this.cameraBody.add(this.views[1].camera);
+        // this.cameraBody.add(this.views[0].camera);
 
-        // Setting up the renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setAnimationLoop(() => this.animate());
-              // nice gray color to start with :)
-        this.renderer.setClearColor(0x272727);
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        document.body.appendChild(this.renderer.domElement);
+        this.cameraBody.lookAt(-11, 0, 50);
 
-        this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+
+        var geometry = new THREE.SphereGeometry(5, 32, 32);
+        var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        var sphere = new THREE.Mesh(geometry, material);
+        sphere.position.set(50, 10, 0);
+
+        var geometry2 = new THREE.SphereGeometry(5, 32, 32);
+        var material2 = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+        var sphere2 = new THREE.Mesh(geometry2, material2);
+        sphere2.position.set(-50, 10, 0);
+
+        this.scene.add(sphere);
+        this.scene.add(sphere2);
+
+        const axesHelper = new THREE.AxesHelper(5);
+        this.scene.add(axesHelper);
+
+        // this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
         // handles window resizing 
@@ -64,8 +90,8 @@ class Main {
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
-      
-      
+
+
         this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(this.ambientLight);
@@ -86,6 +112,8 @@ class Main {
     }
 
     animate() {
+        const speed = 20;
+        const deltaTime = this.clock.getDelta() * speed;
         // Move the camera at a slow, forward steady velocity using delta time
         for (let i = 0; i < this.views.length; i++) {
             // Picking a camera to work with
@@ -107,11 +135,12 @@ class Main {
             // Updating the camera and renderer
             const deltaTime = this.clock.getDelta();
             const speed = 20;
-            camera.position.z -= (deltaTime * speed);
-            camera.lookAt.z -= (deltaTime * speed);
+            // camera.position.z -= (deltaTime * speed);
+            // camera.lookAt.z -= (deltaTime * speed);
 
             this.renderer.render(this.scene, camera);
         }
+        this.cameraBody.position.z -= deltaTime
 
         // Moves all the objects in a random linear direction
         this.ObjectManager.drifting();
