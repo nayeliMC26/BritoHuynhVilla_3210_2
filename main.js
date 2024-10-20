@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
+import Stats from 'stats.js'
+
 
 class Main {
     constructor() {
@@ -84,10 +86,15 @@ class Main {
         this.directionalLight.shadow.camera.bottom = -200;
         this.directionalLight.shadow.camera.near = 1;
         this.directionalLight.shadow.camera.far = 500;
+
+        this.stats = new Stats()
+        this.stats.showPanel(0)
+        document.body.appendChild(this.stats.dom)
+
     }
 
     animate() {
-        
+        this.stats.begin();
         // Move the camera at a slow, forward steady velocity using delta time
         for (let i = 0; i < this.views.length; i++) {
             // Picking a camera to work with
@@ -126,6 +133,8 @@ class Main {
         this.ObjectManager.blend();
 
         this.ObjectManager.relocateObject(this.ObjectManager.objects)
+
+        this.stats.end();
     }
 
     // defines the function of windowResizing
