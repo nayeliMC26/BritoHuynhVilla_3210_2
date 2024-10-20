@@ -142,8 +142,8 @@ export class ObjectManager {
         for (var i = 0; i < objects.length; i++) {
             var object = objects[i];
             // if the object is within a certain distance from the camera send it back or forward by some amt
-            if (object.mesh.position.distanceTo(this.camera.position) < 100) {
-                        object.mesh.translateZ(THREE.MathUtils.randInt(-400, 100))
+            if (object.mesh.position.distanceTo(this.camera.position) < 50 || object.mesh.position.distanceTo(this.camera.position < -50)) {
+                        object.mesh.translateZ(THREE.MathUtils.randInt(-400, 50))
             }
         }
     }
