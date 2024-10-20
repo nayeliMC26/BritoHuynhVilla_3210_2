@@ -112,7 +112,7 @@ export class ObjectManager {
             var objectRelocated = false;
             while (!objectRelocated) {
                 // create a new random position for them to move to 
-                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200));
+                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(600));
                 // move each object to its new position
                 object.mesh.position.copy(newPosition);
                 // create a boundingBox for each object 
@@ -123,10 +123,10 @@ export class ObjectManager {
                     if (i !== j) {
                         // so long as two objects are not the same check if they are intersecting
                         if (object.boundingBox.intersectsBox(objects[j].boundingBox)) {
-                        //     // if they intersect then they are colliding
-                             collision = true;
-                             break;
-                         }
+                            //     // if they intersect then they are colliding
+                            collision = true;
+                            break;
+                        }
                     }
                 }
                 // if they are colliding they should not relocate until they are NOT colliding
@@ -137,10 +137,21 @@ export class ObjectManager {
         }
     }
 
+    relocateObject(objects) {
+        // for all objects in our objectPool
+        for (var i = 0; i < objects.length; i++) {
+            var object = objects[i];
+            // if the object is within a certain distance from the camera send it back 
+            if (object.mesh.position.distanceTo(this.camera.position) < 100){
+                object.mesh.translateZ(-200)
+            }
+        }
+    }
+
     // generates random uniform values
     randomUniforms() {
         var uniform = {
-            // The differnece in coordinates
+            // The difference in coordinates
             deltaX: { value: 0 },
             deltaY: { value: 0 },
             deltaZ: { value: 0 },
@@ -203,7 +214,7 @@ export class ObjectManager {
     blend() {
         this.objects.forEach(function (object) {
             object.mesh.material.blending = THREE.CustomBlending;
-            object.mesh.material.blendEquation = THREE.AddEquation ; //default 
+            object.mesh.material.blendEquation = THREE.AddEquation; //default 
             object.mesh.material.blendSrc = THREE.SrcColorFactor;
             object.mesh.material.blendDst = THREE.OneMinusSrcColorFactor;
         });

@@ -125,8 +125,7 @@ class Main {
         // Enable blending
         this.ObjectManager.blend();
 
-
-
+        this.ObjectManager.relocateObject(this.ObjectManager.objects)
     }
 
     // defines the function of windowResizing
