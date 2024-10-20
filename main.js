@@ -49,7 +49,7 @@ class Main {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.animate());
-              // nice gray color to start with :)
+        // nice gray color to start with :)
         this.renderer.setClearColor(0x272727);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -64,8 +64,8 @@ class Main {
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
-      
-      
+
+
         this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(this.ambientLight);
@@ -121,6 +121,19 @@ class Main {
         // Enable blending
         this.ObjectManager.blend();
 
+        // Check each object for collision with the plane (the camera)
+        for (let i = 0; i < this.ObjectManager.objects.length; i++) {
+
+            // var distance = this.ObjectManager.objects[i].boundingBox.distanceToPoint(this.views[0].lookAt);
+            var collision = this.ObjectManager.objects[i].boundingBox.containsPoint(this.views[0].camera.position);
+            if (collision) {
+                // TODO: Add code to react to the collision
+                console.log("Collision with Camera");
+                break;
+            }
+
+
+        }
     }
 
     // defines the function of windowResizing

@@ -20,7 +20,7 @@ export class ObjectManager {
             // create random meshes using random geometry and random material 
             var randomObject = this.createRandomObject();
             // create a bounding box to handle collisions
-            // randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject);
+            randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject.mesh);
             // add objects to the objectPool
             this.objects.push(randomObject);
             this.scaleFactors.push([1, 1, 1]);
