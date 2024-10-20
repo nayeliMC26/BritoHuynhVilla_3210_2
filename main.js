@@ -34,9 +34,7 @@ class Main {
             clipBias: 0.003,
             textureWidth: window.innerWidth * window.devicePixelRatio,
             textureHeight: window.innerHeight * window.devicePixelRatio,
-            // color: 0xb5b5b5
-            color: 0xff0000,
-            side: THREE.DoubleSide
+            color: 0xb5b5b5
 
         });
         this.mirror.position.set(0, 0, -0.1);
@@ -106,23 +104,25 @@ class Main {
         const deltaTime = this.clock.getDelta() * speed;
         // Move the camera at a slow, forward steady velocity using delta time
         this.mirror.position.copy(this.camera.position);
-        // var cameraDirection = new THREE.Vector3();
-        // this.camera.getWorldDirection(cameraDirection);
-        this.mirror.translateOnAxis(this.cameraDirection, 5)
-        // this.camera.rotation.copy(cameraRotation);
-        // console.log("Bef: ", cameraRotation);
-        // cameraRotation.x *= -1;
-        // cameraRotation.y *= -1;
-        // cameraRotation.z *= -1;
-        // console.log("Af: ", cameraRotation);
-        this.mirror.setRotationFromEuler(this.camera.rotation);
-        // console.log(this.camera.lookAt)
-        // console.log("Cam: ", this.camera.rotation);
-        // console.log("Mir: ", this.mirror.rotation);
-        // console.log("Pos: ", this.camera.position);
-        // console.log("Rot: ", this.camera.rotation);
+        // Create a Vector3 to store the direction
+        let direction = this.camera.position.clone();
 
-        // this.cameraBody.position.z -= deltaTime
+        // Get the camera's look direction
+        this.camera.getWorldDirection(direction);
+        direction.normalize();
+
+        this.mirror.lookAt(direction);
+        this.mirror.rotateY(Math.PI);
+        this.mirror.translateZ(-0.1);
+
+
+
+        // console.log('Camera Look Direction:', direction);
+        // this.mirror.translateOnAxis(direction, 5)
+
+        // this.mirror.setRotationFromEuler(this.camera.rotation);
+
+
 
         // Moves all the objects in a random linear direction
         // this.ObjectManager.drifting();
@@ -132,14 +132,12 @@ class Main {
         // // Enable blending
         // this.ObjectManager.blend();
 
-        this.renderer.setClearColor(0x272727);
         this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
         this.renderer.render(this.scene, this.camera);
         this.mirror.visible = true;
-        this.renderer.setClearColor(0x808080);
         this.renderer.setScissor(...this.mirrorBounds);
         this.renderer.render(this.scene, this.camera);
-        // this.mirror.visible = false;
+        this.mirror.visible = false;
 
     }
 
@@ -168,8 +166,6 @@ class Main {
 
         // Get the direction of the ray
         this.cameraDirection = this.raycaster.ray.direction.clone();
-
-        console.log('Direction:', this.cameraDirection);
     }
 }
 
