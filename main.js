@@ -65,6 +65,12 @@ class Main {
         // Used to calculate delta time
         this.clock = new THREE.Clock();
 
+        // Create a raycaster to detect collisions with objects
+        this.raycaster = new THREE.Raycaster();
+        // Create a point from the main camera looking straight
+        this.pointer = this.views[0].lookAt;
+
+
 
         this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -121,17 +127,19 @@ class Main {
         // Enable blending
         this.ObjectManager.blend();
 
-        // Check each object for collision with the plane (the camera)
-        for (let i = 0; i < this.ObjectManager.objects.length; i++) {
+        // Cast a ray from the main camera to check for intersection with the objects
+        this.raycaster.setFromCamera(this.pointer, this.views[0].camera);
+        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
-            // var distance = this.ObjectManager.objects[i].boundingBox.distanceToPoint(this.views[0].lookAt);
-            var collision = this.ObjectManager.objects[i].boundingBox.containsPoint(this.views[0].camera.position);
-            if (collision) {
+        // Check each object for collision with the plane (the camera)
+        for (let i = 0; i < intersects.length; i++) {
+
+            // Check if the object is close enough to the ray to consider it colliding
+            if (intersects[i].distance > 0 && intersects[i].distance < 5) {
                 // TODO: Add code to react to the collision
                 console.log("Collision with Camera");
                 break;
             }
-
 
         }
     }
