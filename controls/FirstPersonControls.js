@@ -1,3 +1,5 @@
+// source code adapted from https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FirstPersonControls.js
+
 import {
 	Controls,
 	MathUtils,
