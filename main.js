@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ObjectManager } from './ObjectManager.js';
 
@@ -49,13 +49,15 @@ class Main {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.animate());
-              // nice gray color to start with :)
+        // nice gray color to start with :)
         this.renderer.setClearColor(0x272727);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
-        this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+        //this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+        this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement)
+
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
         // handles window resizing 
@@ -64,8 +66,8 @@ class Main {
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
-      
-      
+
+
         this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(this.ambientLight);
@@ -86,6 +88,7 @@ class Main {
     }
 
     animate() {
+        
         // Move the camera at a slow, forward steady velocity using delta time
         for (let i = 0; i < this.views.length; i++) {
             // Picking a camera to work with
@@ -110,8 +113,10 @@ class Main {
             camera.position.z -= (deltaTime * speed);
             camera.lookAt.z -= (deltaTime * speed);
 
+            this.controls.update(deltaTime * speed);
             this.renderer.render(this.scene, camera);
         }
+
 
         // Moves all the objects in a random linear direction
         this.ObjectManager.drifting();
@@ -120,6 +125,8 @@ class Main {
 
         // Enable blending
         this.ObjectManager.blend();
+
+
 
     }
 
