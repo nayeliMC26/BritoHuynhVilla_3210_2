@@ -107,26 +107,26 @@ export class ObjectManager {
     randomPosition(objects) {
         // for every object in the array of random objects made 
         for (var i = 0; i < objects.length; i++) {
-            var object = objects[i].mesh;
+            var object = objects[i];
             // start with the object not being relocated, so at 0,0,0
             var objectRelocated = false;
             while (!objectRelocated) {
                 // create a new random position for them to move to 
                 var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200));
                 // move each object to its new position
-                object.position.copy(newPosition);
+                object.mesh.position.copy(newPosition);
                 // create a boundingBox for each object 
-                // object.boundingBox.setFromObject(object);
+                object.boundingBox.setFromObject(object.mesh);
 
                 var collision = false;
                 for (var j = 0; j < objects.length; j++) {
                     if (i !== j) {
                         // so long as two objects are not the same check if they are intersecting
-                        // if (object.boundingBox.intersectsBox(objects[j].boundingBox)) {
+                        if (object.boundingBox.intersectsBox(objects[j].boundingBox)) {
                         //     // if they intersect then they are colliding
-                        //     collision = true;
-                        //     break;
-                        // }
+                             collision = true;
+                             break;
+                         }
                     }
                 }
                 // if they are colliding they should not relocate until they are NOT colliding
@@ -203,7 +203,7 @@ export class ObjectManager {
     blend() {
         this.objects.forEach(function (object) {
             object.mesh.material.blending = THREE.CustomBlending;
-            object.mesh.material.blendEquation = THREE.AddEquation; //default 
+            object.mesh.material.blendEquation = THREE.AddEquation ; //default 
             object.mesh.material.blendSrc = THREE.SrcColorFactor;
             object.mesh.material.blendDst = THREE.OneMinusSrcColorFactor;
         });
