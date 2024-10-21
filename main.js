@@ -1,8 +1,10 @@
 import * as THREE from 'three';
-
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ObjectManager } from './ObjectManager.js';
+
 import { Reflector } from 'three/addons/objects/Reflector.js';
+
+import { FirstPersonControls } from './controls/FirstPersonControls.js';
+
 
 class Main {
     constructor() {
@@ -19,6 +21,7 @@ class Main {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
+
 
         // Setting up the camera 
         this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
@@ -52,6 +55,10 @@ class Main {
 
 
         // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+
+        //this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+        this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement)
+
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.camera);
         // handles window resizing 
@@ -82,9 +89,11 @@ class Main {
     }
 
     animate() {
+
         // this.controls.update();
         // The time between animate() calls
         const deltaTime = this.clock.getDelta();
+
         // Move the camera at a slow, forward steady velocity using delta time
         this.camera.position.z -= this.cameraSpeed * deltaTime
 
@@ -95,6 +104,7 @@ class Main {
         this.camera.getWorldDirection(direction);
         direction.normalize();
 
+
         // Updating the mirror to adjust for the new camera posistion
         this.mirror.position.copy(this.camera.position);
         // Looking at the same direction the camera 
@@ -103,6 +113,15 @@ class Main {
         this.mirror.rotateY(Math.PI);
         // Moving it to the near plane of the camera
         this.mirror.translateZ(-0.1);
+            // Updating the camera and renderer
+            const deltaTime = this.clock.getDelta();
+            const speed = 20;
+            // camera.position.z -= (deltaTime * speed);
+            // camera.lookAt.z -= (deltaTime * speed);
+
+         this.controls.update(deltaTime * speed);
+
+
 
         // Moves all the objects in a random linear direction
         this.ObjectManager.drifting();
@@ -121,6 +140,7 @@ class Main {
         this.renderer.setScissor(...this.mirrorBounds);
         this.renderer.render(this.scene, this.camera);
         this.mirror.visible = false;
+
     }
 
     // defines the function of windowResizing
