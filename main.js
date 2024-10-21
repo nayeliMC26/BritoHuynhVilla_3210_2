@@ -138,8 +138,8 @@ class Main {
         // Check each object for collision with the plane (the camera)
         for (let i = 0; i < intersects.length; i++) {
 
-            // Check if the object is close enough to the ray to consider it colliding
-            if (intersects[i].distance > 0 && intersects[i].distance < 5) {
+            // Check if the object is close enough to the ray to consider it colliding, exclusing the rear-view camera
+            if (intersects[i].distance > 1 && intersects[i].distance < 2) {
                 // TODO: Add code to react to the collision
                 console.log("Collision with Camera");
                 break;
