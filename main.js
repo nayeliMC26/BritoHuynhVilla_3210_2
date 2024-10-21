@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 class Main {
@@ -20,40 +21,48 @@ class Main {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
-
-        // Setting up the camera 
-        this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
-        this.scene.add(this.camera);
+        // Object with the required information for each camera
+        this.views = [
+            {
+                camera: "",
+                inverted: false,
+                // The parameters of the view port (percetages of the screen)
+                left: 0,
+                bottom: 0,
+                width: 1,
+                height: 1,
+                background: 0x272727
+            },
+            {
+                camera: "",
+                inverted: true,
+                // The parameters of the view port (percetages of the screen)
+                left: 0.2,
+                bottom: 0.75,
+                width: (window.innerWidth - (window.innerWidth * 0.4)) / window.innerWidth,
+                height: (window.innerHeight - (window.innerHeight * 0.8)) / window.innerHeight,
+                background: 0x808080
+            }
+        ];
+        // Creating the cameras
+        for (let i = 0; i < this.views.length; i++) {
+            const view = this.views[i];
+            const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
+            view.camera = camera;
+            this.scene.add(camera);
+        }
         this.cameraSpeed = 20;
 
-        // Setting up the rear view mirror
-        var mirrorGeometry = new THREE.PlaneGeometry(1, 1);
-        // Gives the geometry a reflective texture
-        this.mirror = new Reflector(mirrorGeometry, {
-            clipBias: 0.003,
-            textureWidth: window.innerWidth * window.devicePixelRatio,
-            textureHeight: window.innerHeight * window.devicePixelRatio,
-            color: 0xffffff
+        // Flipping rear camera around
+        this.views[1].camera.rotateY(Math.PI);
+        this.views[1].camera.projectionMatrix.elements[0] *= -1;
+        // Adding rear camera to front camera so they move together
+        this.views[0].camera.add(this.views[1].camera);
+        // Moving the camera to a desired intial position
+        this.views[0].camera.translateZ(200)
 
-        });
-        // Moving the mirror to the near plane of the camera
-        this.mirror.translateZ(-0.1);
-        this.mirror.visible = false;
-        this.scene.add(this.mirror);
-        // Adding mirror to camera so they move together
-        this.camera.add(this.mirror);
-        this.camera.translateZ(200);
-
-        // The bounds for scissor rasterization of the mirror
-        this.mirrorBounds = [
-            0.2 * window.innerWidth,
-            0.75 * window.innerHeight,
-            0.6 * window.innerWidth,
-            0.2 * window.innerHeight
-        ];
-
-        //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls = new FirstPersonControls(this.camera, this.renderer.domElement)
+        // this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+        this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement)
 
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.camera);
@@ -81,8 +90,6 @@ class Main {
 
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize(), false);
-        window.addEventListener('keydown', (event) => this.keyDown(event), false);
-        window.addEventListener('keyup', (event) => this.keyUp(event), false);
     }
 
     animate() {
@@ -93,35 +100,48 @@ class Main {
         // Move the camera at a slow, forward steady velocity using delta time
         this.controls.update(deltaTime * this.cameraSpeed);
 
+
         // Moves all the objects in a random linear direction
-        this.ObjectManager.drifting();
+        this.ObjectManager.drifting(deltaTime);
 
         // Scales all the objects x, y, and z on a sin pattern
-        this.ObjectManager.transformations();
+        this.ObjectManager.transformations(deltaTime);
 
         // Enable blending
         this.ObjectManager.blend();
 
-        // updating renderer
-        this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
-        this.renderer.render(this.scene, this.camera);
-        // Rendering the rear view mirror
-        this.mirror.visible = true;
-        this.renderer.setScissor(...this.mirrorBounds);
-        this.renderer.render(this.scene, this.camera);
-        this.mirror.visible = false;
+        // Updating camera and renderer
+        for (let i = 0; i < this.views.length; i++) {
+            // Picking a camera to work with
+            const view = this.views[i];
+            const camera = view.camera;
+
+            // Parameters of the view port
+            const left = Math.floor(view.left * window.innerWidth);
+            const bottom = Math.floor(view.bottom * window.innerHeight);
+            const width = Math.floor(view.width * window.innerWidth);
+            const height = Math.floor(view.height * window.innerHeight);
+
+            // Updating the renderer the view port
+            this.renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+            this.renderer.setScissor(left, bottom, width, height);
+            this.renderer.setClearColor(view.background);
+            this.renderer.render(this.scene, camera);
+        }
+
+
     }
 
     // defines the function of windowResizing
     onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.mirrorBounds = [
-            0.2 * window.innerWidth,
-            0.75 * window.innerHeight,
-            0.6 * window.innerWidth,
-            0.2 * window.innerHeight
-        ];
+        this.views.forEach(function (view) {
+            const camera = view.camera;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            if (view.inverted) {
+                camera.projectionMatrix.elements[0] *= -1;
+            }
+        });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 }
