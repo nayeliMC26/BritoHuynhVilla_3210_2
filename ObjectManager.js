@@ -55,9 +55,6 @@ export class ObjectManager {
             deltaSX: scaleStart,
             deltaSY: scaleStart,
             deltaSZ: scaleStart
-            // scaleSpeed: (Math.random() - 0.5) / 10
-            // scaleSpeed: (Math.random() - 0.5) / 10
-            // scaleSpeed: (Math.random() - 0.5) / 10
         }
         return object
     }

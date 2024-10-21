@@ -23,7 +23,6 @@ class Main {
 
         // Setting up the camera 
         this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
-        this.camera.translateZ(200);
         this.scene.add(this.camera);
         this.cameraSpeed = 20;
 
@@ -38,10 +37,12 @@ class Main {
 
         });
         // Moving the mirror to the near plane of the camera
-        this.mirror.position.set(0, 0, -0.1);
-        this.mirror.translateZ(200);
+        this.mirror.translateZ(-0.1);
         this.mirror.visible = false;
         this.scene.add(this.mirror);
+        // Adding mirror to camera so they move together
+        this.camera.add(this.mirror);
+        this.camera.translateZ(200);
 
         // The bounds for scissor rasterization of the mirror
         this.mirrorBounds = [
@@ -80,33 +81,17 @@ class Main {
 
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize(), false);
+        window.addEventListener('keydown', (event) => this.keyDown(event), false);
+        window.addEventListener('keyup', (event) => this.keyUp(event), false);
     }
 
     animate() {
         // this.controls.update();
         // The time between animate() calls
         const deltaTime = this.clock.getDelta();
-        const speed = 20;
 
         // Move the camera at a slow, forward steady velocity using delta time
-        this.controls.update(deltaTime * speed);
-        // this.camera.position.z -= this.cameraSpeed * deltaTime
-
-        // Variable that acts as the camera look at direction
-        var direction = new THREE.Vector3;
-
-        // Getting the camera look at direction
-        this.camera.getWorldDirection(direction);
-        direction.normalize();
-
-        // Updating the mirror to adjust for the new camera posistion
-        this.mirror.position.copy(this.camera.position);
-        // Looking at the same direction the camera 
-        this.mirror.lookAt(direction);
-        // FLip around so that it refelcts behind the camera
-        this.mirror.rotateY(Math.PI);
-        // Moving it to the near plane of the camera
-        this.mirror.translateZ(-0.1);
+        this.controls.update(deltaTime * this.cameraSpeed);
 
         // Moves all the objects in a random linear direction
         this.ObjectManager.drifting();
@@ -125,12 +110,10 @@ class Main {
         this.renderer.setScissor(...this.mirrorBounds);
         this.renderer.render(this.scene, this.camera);
         this.mirror.visible = false;
-
     }
 
     // defines the function of windowResizing
     onWindowResize() {
-
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.mirrorBounds = [
@@ -142,7 +125,4 @@ class Main {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 }
-
 var game = new Main();
-
-
