@@ -137,7 +137,6 @@ class Main {
                 this.camera.getWorldDirection(direction);
                 direction.normalize();
                 // Send the object away from the camera
-                this.playSound('audio/boing.mp3');
                 this.bounceObject(direction, intersects[i].object, 200);
                 break;
             }
@@ -151,6 +150,8 @@ class Main {
      * @param {Number} distance 
      */
     bounceObject(cameraDirection, object, distance) {
+        // Play a "boing" sound
+        this.playSound('audio/boing.mp3');
         // Timeout code adapted from https://www.sitepoint.com/delay-sleep-pause-wait/
         for (let i = 0; i < distance; i++) {
             setTimeout(() => { object.translateOnAxis(cameraDirection, 5); }, i * 10); // Move the object each 10 ms
@@ -171,7 +172,7 @@ class Main {
 
     /**
      * Play an audio file
-     * @param {*} audioFile 
+     * @param {String} audioFile the name of the audio file
      */
     playSound(audioFile) {
         const listener = new THREE.AudioListener();
@@ -181,9 +182,11 @@ class Main {
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load(audioFile, function (buffer) {
             sound.setBuffer(buffer);
-            sound.setLoop(true);
+            sound.setLoop(false);
             sound.setVolume(0.5);
             sound.play();
+            sound.stop(2); // Stop after 2 seconds
+            
         });
     }
 }
