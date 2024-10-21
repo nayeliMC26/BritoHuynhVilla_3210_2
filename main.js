@@ -20,33 +20,29 @@ class Main {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
-        // Group to act as the body of the cameras
-
+        // Setting up the camera 
         this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
-        // this.camera.translateZ(-5);
-        this.camera.position.set(0, 0, 1)
+        this.camera.translateZ(200);
         this.scene.add(this.camera);
+        this.cameraSpeed = 20;
 
+        // Setting up the rear view mirror
         var mirrorGeometry = new THREE.PlaneGeometry(1, 1);
-        // var mat = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-        // this.mirror = new THREE.Mesh(mirrorGeometry, mat);
+        // Gives the geometry a reflective texture
         this.mirror = new Reflector(mirrorGeometry, {
             clipBias: 0.003,
             textureWidth: window.innerWidth * window.devicePixelRatio,
             textureHeight: window.innerHeight * window.devicePixelRatio,
-            color: 0xb5b5b5
+            color: 0xffffff
 
         });
+        // Moving the mirror to the near plane of the camera
         this.mirror.position.set(0, 0, -0.1);
-        // this.mirror.translateZ(50);
+        this.mirror.translateZ(200);
         this.mirror.visible = false;
         this.scene.add(this.mirror);
 
-        this.mirrorBB = new THREE.Box3();
-        this.mirrorBB.setFromObject(this.mirror);
-        this.helper = new THREE.Box3Helper(this.mirrorBB, 0xffff00);
-        this.scene.add(this.helper);
-
+        // The bounds for scissor rasterization of the mirror
         this.mirrorBounds = [
             0.2 * window.innerWidth,
             0.75 * window.innerHeight,
@@ -54,25 +50,12 @@ class Main {
             0.2 * window.innerHeight
         ];
 
-        this.cameraBody = new THREE.Group();
-        // this.cameraBody.rotateY(-Math.PI / 2)
-        this.cameraBody.add(this.camera, this.mirror);
-        this.scene.add(this.cameraBody);
-        // this.cameraBody.position.z += 50;
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
-        this.cameraDirection = new THREE.Ray();
 
-
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.camera);
         // handles window resizing 
 
-        window.addEventListener('resize', () => this.onWindowResize(), false)
-
-        this.axis = new THREE.AxesHelper();
-        this.scene.add(this.axis);
         // Used to calculate delta time
         this.clock = new THREE.Clock();
 
@@ -95,50 +78,49 @@ class Main {
         this.directionalLight.shadow.camera.near = 1;
         this.directionalLight.shadow.camera.far = 500;
 
-        window.addEventListener('mousemove', (event) => { this.onMouseMove(event) });
+        window.addEventListener('resize', () => this.onWindowResize(), false);
     }
 
     animate() {
-        this.controls.update();
-        const speed = 20;
-        const deltaTime = this.clock.getDelta() * speed;
+        // this.controls.update();
+        // The time between animate() calls
+        const deltaTime = this.clock.getDelta();
         // Move the camera at a slow, forward steady velocity using delta time
-        this.mirror.position.copy(this.camera.position);
-        // Create a Vector3 to store the direction
-        let direction = this.camera.position.clone();
+        this.camera.position.z -= this.cameraSpeed * deltaTime
 
-        // Get the camera's look direction
+        // Variable that acts as the camera look at direction
+        var direction = new THREE.Vector3;
+
+        // Getting the camera look at direction
         this.camera.getWorldDirection(direction);
         direction.normalize();
 
+        // Updating the mirror to adjust for the new camera posistion
+        this.mirror.position.copy(this.camera.position);
+        // Looking at the same direction the camera 
         this.mirror.lookAt(direction);
+        // FLip around so that it refelcts behind the camera
         this.mirror.rotateY(Math.PI);
+        // Moving it to the near plane of the camera
         this.mirror.translateZ(-0.1);
 
-
-
-        // console.log('Camera Look Direction:', direction);
-        // this.mirror.translateOnAxis(direction, 5)
-
-        // this.mirror.setRotationFromEuler(this.camera.rotation);
-
-
-
         // Moves all the objects in a random linear direction
-        // this.ObjectManager.drifting();
+        this.ObjectManager.drifting();
 
-        // this.ObjectManager.transformations();
+        // Scales all the objects x, y, and z on a sin pattern
+        this.ObjectManager.transformations();
 
-        // // Enable blending
-        // this.ObjectManager.blend();
+        // Enable blending
+        this.ObjectManager.blend();
 
+        // updating renderer
         this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
         this.renderer.render(this.scene, this.camera);
+        // Rendering the rear view mirror
         this.mirror.visible = true;
         this.renderer.setScissor(...this.mirrorBounds);
         this.renderer.render(this.scene, this.camera);
         this.mirror.visible = false;
-
     }
 
     // defines the function of windowResizing
@@ -153,19 +135,6 @@ class Main {
             0.2 * window.innerHeight
         ];
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    onMouseMove(event) {
-        // console.log(this.mouse)
-        // Convert mouse position to normalized device coordinates (-1 to +1)
-        this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        // Update raycaster to calculate ray from camera through mouse position
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        // Get the direction of the ray
-        this.cameraDirection = this.raycaster.ray.direction.clone();
     }
 }
 
