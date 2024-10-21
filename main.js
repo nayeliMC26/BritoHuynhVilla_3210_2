@@ -62,10 +62,6 @@ class Main {
 
         // Create a raycaster to detect collisions with objects
         this.raycaster = new THREE.Raycaster();
-        // Create a point from the main camera looking straight
-        this.pointer = this.camera.getWorldDirection(new THREE.Vector3(0, 0, -1));
-
-
 
         this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -132,7 +128,9 @@ class Main {
         this.renderer.setScissor(...this.mirrorBounds);
         this.renderer.render(this.scene, this.camera);
         this.mirror.visible = false;        
-        
+        // Create a point from the main camera looking straight
+        this.pointer = new THREE.Vector3(0, 0, 1);
+
         // Cast a ray from the main camera to check for intersection with the objects
         this.raycaster.setFromCamera(this.pointer, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
