@@ -96,16 +96,16 @@ class Main {
         // this.camera.position.z -= this.cameraSpeed * deltaTime
 
         // Variable that acts as the camera look at direction
-        var direction = new THREE.Vector3;
+        this.direction = new THREE.Vector3;
 
         // Getting the camera look at direction
-        this.camera.getWorldDirection(direction);
-        direction.normalize();
+        this.camera.getWorldDirection(this.direction);
+        this.direction.normalize();
 
         // Updating the mirror to adjust for the new camera posistion
         this.mirror.position.copy(this.camera.position);
         // Looking at the same direction the camera 
-        this.mirror.lookAt(direction);
+        this.mirror.lookAt(this.direction);
         // FLip around so that it refelcts behind the camera
         this.mirror.rotateY(Math.PI);
         // Moving it to the near plane of the camera
@@ -138,16 +138,26 @@ class Main {
         // Check each object for collision with the plane (the camera)
         for (let i = 0; i < intersects.length; i++) {
 
-            // Check if the object is close enough to the ray to consider it colliding, exclusing the rear-view camera
+            // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera
             if (intersects[i].distance > 1 && intersects[i].distance < 2) {
-                // TODO: Add code to react to the collision
-                console.log("Collision with Camera");
+                // Send the object away from the camera
+                this.bounceObject(intersects[i].object, 200);
                 break;
             }
 
         }
     }
-
+    /**
+     * Bounce/send an object off by distance 
+     * @param {THREE.Object3D} object 
+     * @param {Number} distance 
+     */
+    bounceObject(object, distance) {
+        // Timeout code adapted from https://www.sitepoint.com/delay-sleep-pause-wait/
+        for (let i = 0; i < distance; i++) {
+            setTimeout(() => { object.translateOnAxis(this.direction, 5);}, i * 10); // Move the object each 10 ms
+        }
+    }
     // defines the function of windowResizing
     onWindowResize() {
 
