@@ -137,6 +137,7 @@ class Main {
                 this.camera.getWorldDirection(direction);
                 direction.normalize();
                 // Send the object away from the camera
+                this.playSound('audio/boing.mp3');
                 this.bounceObject(direction, intersects[i].object, 200);
                 break;
             }
@@ -166,6 +167,24 @@ class Main {
             0.2 * window.innerHeight
         ];
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    /**
+     * Play an audio file
+     * @param {*} audioFile 
+     */
+    playSound(audioFile) {
+        const listener = new THREE.AudioListener();
+        this.camera.add(listener);
+        // Create a global audio source
+        const sound = new THREE.Audio(listener);
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load(audioFile, function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(true);
+            sound.setVolume(0.5);
+            sound.play();
+        });
     }
 }
 var game = new Main();
