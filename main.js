@@ -61,6 +61,9 @@ class Main {
         // Used to calculate delta time
         this.clock = new THREE.Clock();
 
+        // Create a raycaster to detect collisions with objects
+        this.raycaster = new THREE.Raycaster();
+
         this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(this.ambientLight);
@@ -90,6 +93,7 @@ class Main {
         // The time between animate() calls
         const deltaTime = this.clock.getDelta();
 
+
         // Move the camera at a slow, forward steady velocity using delta time
         this.controls.update(deltaTime * this.cameraSpeed);
 
@@ -110,8 +114,47 @@ class Main {
         this.renderer.setScissor(...this.mirrorBounds);
         this.renderer.render(this.scene, this.camera);
         this.mirror.visible = false;
-    }
+        // Create a point from the main camera looking straight
 
+
+
+        this.pointer = new THREE.Vector3(0, 0, 1);
+
+        // Cast a ray from the main camera to check for intersection with the objects
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+        // Variable that acts as the camera look at direction
+        var direction = new THREE.Vector3;
+
+        // Check each object for collision with the plane (the camera)
+        for (let i = 0; i < intersects.length; i++) {
+
+            // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera
+            if (intersects[i].distance > 1 && intersects[i].distance < 2) {
+
+                // Getting the camera look at direction
+                this.camera.getWorldDirection(direction);
+                direction.normalize();
+                // Send the object away from the camera
+                this.bounceObject(direction, intersects[i].object, 200);
+                break;
+            }
+
+        }
+    }
+    /**
+     * Bounce/send an object off by distance 
+     * @param {THREE.Vector3} cameraDirection 
+     * @param {THREE.Object3D} object 
+     * @param {Number} distance 
+     */
+    bounceObject(cameraDirection, object, distance) {
+        // Timeout code adapted from https://www.sitepoint.com/delay-sleep-pause-wait/
+        for (let i = 0; i < distance; i++) {
+            setTimeout(() => { object.translateOnAxis(cameraDirection, 5); }, i * 10); // Move the object each 10 ms
+        }
+    }
     // defines the function of windowResizing
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
