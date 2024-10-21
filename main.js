@@ -63,7 +63,7 @@ class Main {
         // Create a raycaster to detect collisions with objects
         this.raycaster = new THREE.Raycaster();
         // Create a point from the main camera looking straight
-        this.pointer = this.views[0].lookAt;
+        this.pointer = this.camera.getWorldDirection(new THREE.Vector3(0, 0, -1));
 
 
 
@@ -134,7 +134,7 @@ class Main {
         this.mirror.visible = false;        
         
         // Cast a ray from the main camera to check for intersection with the objects
-        this.raycaster.setFromCamera(this.pointer, this.views[0].camera);
+        this.raycaster.setFromCamera(this.pointer, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
         // Check each object for collision with the plane (the camera)
