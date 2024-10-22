@@ -132,7 +132,7 @@ class Main {
         for (let i = 0; i < intersects.length; i++) {
 
             // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera
-            if (intersects[i].distance > 1 && intersects[i].distance < 2) {
+            if (intersects[i].distance > 1 && intersects[i].distance < 10) {
 
                 // Getting the camera look at direction
                 this.camera.getWorldDirection(direction);
