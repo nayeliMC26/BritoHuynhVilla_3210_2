@@ -76,6 +76,10 @@ class Main {
         this.directionalLight.castShadow = true;
         this.scene.add(this.directionalLight);
 
+        window.addEventListener('resize', () => this.onWindowResize(), false);
+        window.addEventListener('keydown', (event) => this.keyDown(event), false);
+        window.addEventListener('keyup', (event) => this.keyUp(event), false);
+
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
