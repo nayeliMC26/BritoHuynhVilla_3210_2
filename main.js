@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 
@@ -19,14 +20,14 @@ class Main {
         this.renderer.setClearColor(0x272727);
         this.renderer.setScissorTest(true);
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = THREE.BasicShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
 
         // Setting up the camera 
         this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
         this.scene.add(this.camera);
-        this.cameraSpeed = 20;
+        this.cameraSpeed = 50;
 
         // Setting up the rear view mirror
         var mirrorGeometry = new THREE.PlaneGeometry(1, 1);
@@ -79,6 +80,28 @@ class Main {
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
 
+        /*"Cockpit Model Vr" (https://skfb.ly/6QTwx) by chiefpad 
+         * is licensed under Creative Commons Attribution 
+         * (http://creativecommons.org/licenses/by/4.0/). 
+         * 
+         * "Fancy Victorian Square Picture Frame" (https://skfb.ly/6ZIHt) by Jamie McFarlane is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+        */
+         
+        this.loader = new GLTFLoader();
+        // load in the model from the assets folder
+        this.loader.load(
+            'assets/models/source/cockpit_model_vr.gltf',
+            (gltf) => {
+                this.model = gltf.scene;
+                this.scene.add(this.model);
+                // position the model such that we are looking through the window of the ship
+                this.model.position.set(0, -1, -0.78);
+                // model is loaded in facing the wrong way so we rotate it
+                this.model.rotation.y = Math.PI;
+                this.camera.add(this.model);
+
+            }
+        )
     }
 
     animate() {
@@ -101,27 +124,6 @@ class Main {
 
         // Updating the camera and renderer
         const deltaTime = this.clock.getDelta();
-        const speed = 50;
-
-        // handles window resizing 
-        window.addEventListener('resize', () => this.onWindowResize(), false);
-        window.addEventListener('keydown', (event) => this.keyDown(event), false);
-        window.addEventListener('keyup', (event) => this.keyUp(event), false);
-
-        // Move the camera at a slow, forward steady velocity using delta time
-        this.controls.update(deltaTime * this.cameraSpeed);
-
-        // Moves all the objects in a random linear direction
-        this.ObjectManager.drifting();
-
-        // Scales all the objects x, y, and z on a sin pattern
-        this.ObjectManager.transformations();
-
-        // Enable blending
-        this.ObjectManager.blend();
-
-        this.ObjectManager.loopObjects(this.ObjectManager.objects)
-        this.stats.end();
 
         // Variable that acts as the camera look at direction
         var direction = new THREE.Vector3;
@@ -141,6 +143,22 @@ class Main {
             }
 
         }
+
+        // Move the camera at a slow, forward steady velocity using delta time
+        this.controls.update(deltaTime * this.cameraSpeed);
+
+        // Moves all the objects in a random linear direction
+        this.ObjectManager.drifting();
+
+        // Scales all the objects x, y, and z on a sin pattern
+        this.ObjectManager.transformations();
+
+        // Enable blending
+        this.ObjectManager.blend();
+
+        this.ObjectManager.loopObjects(this.ObjectManager.objects)
+        this.stats.end();
+
     }
 
 
@@ -152,7 +170,7 @@ class Main {
      */
     bounceObject(cameraDirection, object, distance) {
         // Play a "boing" sound
-        this.playSound('audio/boing.mp3');
+        this.playSound('assets/sounds/boing.mp3');
         // Timeout code adapted from https://www.sitepoint.com/delay-sleep-pause-wait/
         for (let i = 0; i < distance; i++) {
             setTimeout(() => { object.translateOnAxis(cameraDirection, 5); }, i * 10); // Move the object each 10 ms
