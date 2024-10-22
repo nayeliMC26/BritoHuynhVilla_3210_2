@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
+import Stats from 'three/examples/jsm/libs/stats.module'
+
 
 
 class Main {
@@ -72,27 +74,39 @@ class Main {
         this.directionalLight.position.set(50, -200, 0);
         this.directionalLight.castShadow = true;
         this.scene.add(this.directionalLight);
-        this.helper = new THREE.CameraHelper(this.directionalLight.shadow.camera);
-        //this.scene.add(this.helper);
 
-        this.directionalLight.shadow.camera.left = -200;
-        this.directionalLight.shadow.camera.right = 200;
-        this.directionalLight.shadow.camera.top = 200;
-        this.directionalLight.shadow.camera.bottom = -200;
-        this.directionalLight.shadow.camera.near = 1;
-        this.directionalLight.shadow.camera.far = 500;
+        this.stats = Stats()
+        this.stats.showPanel(0)
+        document.body.appendChild(this.stats.dom)
+
+    }
+
+    animate() {
+        this.stats.begin();
+        // updating renderer
+        this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+        this.renderer.render(this.scene, this.camera);
+        // Rendering the rear view mirror
+        this.mirror.visible = true;
+        this.renderer.setScissor(...this.mirrorBounds);
+        this.renderer.render(this.scene, this.camera);
+        this.mirror.visible = false;
+        // Create a point from the main camera looking straight
+
+        this.pointer = new THREE.Vector3(0, 0, 1);
+
+        // Cast a ray from the main camera to check for intersection with the objects
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+        // Updating the camera and renderer
+        const deltaTime = this.clock.getDelta();
+        const speed = 50;
 
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize(), false);
         window.addEventListener('keydown', (event) => this.keyDown(event), false);
         window.addEventListener('keyup', (event) => this.keyUp(event), false);
-    }
-
-    animate() {
-        // this.controls.update();
-        // The time between animate() calls
-        const deltaTime = this.clock.getDelta();
-
 
         // Move the camera at a slow, forward steady velocity using delta time
         this.controls.update(deltaTime * this.cameraSpeed);
@@ -106,23 +120,8 @@ class Main {
         // Enable blending
         this.ObjectManager.blend();
 
-        // updating renderer
-        this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
-        this.renderer.render(this.scene, this.camera);
-        // Rendering the rear view mirror
-        this.mirror.visible = true;
-        this.renderer.setScissor(...this.mirrorBounds);
-        this.renderer.render(this.scene, this.camera);
-        this.mirror.visible = false;
-        // Create a point from the main camera looking straight
-
-
-
-        this.pointer = new THREE.Vector3(0, 0, 1);
-
-        // Cast a ray from the main camera to check for intersection with the objects
-        this.raycaster.setFromCamera(this.pointer, this.camera);
-        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+        this.ObjectManager.loopObjects(this.ObjectManager.objects)
+        this.stats.end();
 
         // Variable that acts as the camera look at direction
         var direction = new THREE.Vector3;
@@ -143,6 +142,8 @@ class Main {
 
         }
     }
+
+
     /**
      * Bounce/send an object off by distance 
      * @param {THREE.Vector3} cameraDirection 
@@ -186,8 +187,10 @@ class Main {
             sound.setVolume(0.5);
             sound.play();
             sound.stop(2); // Stop after 2 seconds
-            
+
         });
     }
 }
+
+
 var game = new Main();

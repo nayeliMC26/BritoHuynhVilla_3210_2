@@ -9,7 +9,7 @@ export class ObjectManager {
         this.objects = [];
         this.scaleFactors = [];
         // number of objects that will get generated 
-        this.objectsMax = 200;
+        this.objectsMax = 300;
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
     }
@@ -109,7 +109,7 @@ export class ObjectManager {
             var objectRelocated = false;
             while (!objectRelocated) {
                 // create a new random position for them to move to 
-                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200), THREE.MathUtils.randFloatSpread(200));
+                var newPosition = new THREE.Vector3(THREE.MathUtils.randFloatSpread(250), THREE.MathUtils.randFloatSpread(250), THREE.MathUtils.randFloatSpread(600));
                 // move each object to its new position
                 object.mesh.position.copy(newPosition);
                 // create a boundingBox for each object 
@@ -120,10 +120,10 @@ export class ObjectManager {
                     if (i !== j) {
                         // so long as two objects are not the same check if they are intersecting
                         if (object.boundingBox.intersectsBox(objects[j].boundingBox)) {
-                        //     // if they intersect then they are colliding
-                             collision = true;
-                             break;
-                         }
+                            //     // if they intersect then they are colliding
+                            collision = true;
+                            break;
+                        }
                     }
                 }
                 // if they are colliding they should not relocate until they are NOT colliding
@@ -134,10 +134,29 @@ export class ObjectManager {
         }
     }
 
+    loopObjects(objects) {
+
+        // for all objects in our objectPool
+        for (var i = 0; i < objects.length; i++) {
+            var object = objects[i];
+
+            // if the object is within a certain distance from the camera send it back or forward by some amt
+            if (Math.random() < 0.1) { // 20% chance to be  relocated
+                // if the position of the object is within 200 units behind the camera
+                if (object.mesh.position.z > this.camera.position.z + 200) {
+                    // move the objects back by a number between 500 and 1000
+                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500,1000));
+
+
+                }
+            }
+        }
+    }
+
     // generates random uniform values
     randomUniforms() {
         var uniform = {
-            // The differnece in coordinates
+            // The difference in coordinates
             deltaX: { value: 0 },
             deltaY: { value: 0 },
             deltaZ: { value: 0 },
@@ -200,7 +219,7 @@ export class ObjectManager {
     blend() {
         this.objects.forEach(function (object) {
             object.mesh.material.blending = THREE.CustomBlending;
-            object.mesh.material.blendEquation = THREE.AddEquation ; //default 
+            object.mesh.material.blendEquation = THREE.AddEquation; //default 
             object.mesh.material.blendSrc = THREE.SrcColorFactor;
             object.mesh.material.blendDst = THREE.OneMinusSrcColorFactor;
         });
