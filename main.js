@@ -80,7 +80,10 @@ class Main {
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
 
-        // model adapted from https://skfb.ly/6QTwx
+        /*"Cockpit Model Vr" (https://skfb.ly/6QTwx) by chiefpad 
+         * is licensed under Creative Commons Attribution 
+         * (http://creativecommons.org/licenses/by/4.0/). */
+         
         this.loader = new GLTFLoader();
         // load in the model from the assets folder
         this.loader.load(
