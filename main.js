@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
-import Stats from 'stats.js'
+import Stats from 'three/examples/jsm/libs/stats.module'
 
 
 class Main {
@@ -87,7 +87,7 @@ class Main {
         this.directionalLight.shadow.camera.near = 1;
         this.directionalLight.shadow.camera.far = 500;
 
-        this.stats = new Stats()
+        this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
 
@@ -115,9 +115,7 @@ class Main {
 
             // Updating the camera and renderer
             const deltaTime = this.clock.getDelta();
-            const speed = 20;
-            // camera.position.z -= (deltaTime * speed);
-            // camera.lookAt.z -= (deltaTime * speed);
+            const speed = 50;
 
             this.controls.update(deltaTime * speed);
             this.renderer.render(this.scene, camera);
@@ -132,8 +130,7 @@ class Main {
         // Enable blending
         this.ObjectManager.blend();
 
-        this.ObjectManager.relocateObject(this.ObjectManager.objects)
-
+        this.ObjectManager.loopObjects(this.ObjectManager.objects)
         this.stats.end();
     }
 
