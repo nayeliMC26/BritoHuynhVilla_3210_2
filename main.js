@@ -82,7 +82,10 @@ class Main {
 
         /*"Cockpit Model Vr" (https://skfb.ly/6QTwx) by chiefpad 
          * is licensed under Creative Commons Attribution 
-         * (http://creativecommons.org/licenses/by/4.0/). */
+         * (http://creativecommons.org/licenses/by/4.0/). 
+         * 
+         * "Fancy Victorian Square Picture Frame" (https://skfb.ly/6ZIHt) by Jamie McFarlane is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+        */
          
         this.loader = new GLTFLoader();
         // load in the model from the assets folder
