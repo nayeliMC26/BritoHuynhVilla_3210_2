@@ -48,9 +48,9 @@ export class ObjectManager {
         }
         var object = {
             mesh: shape,
-            deltaX: (Math.random() - 0.5) / 10,
-            deltaY: (Math.random() - 0.5) / 10,
-            deltaZ: (Math.random() - 0.5) / 10,
+            deltaX: (Math.random() - 0.5) * 5,
+            deltaY: (Math.random() - 0.5) * 5,
+            deltaZ: (Math.random() - 0.5) * 5,
             scaleOrigin: scaleStart,
             deltaSX: scaleStart,
             deltaSY: scaleStart,
@@ -171,18 +171,18 @@ export class ObjectManager {
     }
 
     // Moves the shape in a linear direction
-    drifting() {
+    drifting(deltaTime) {
         // For all the objects in the object pool
         this.objects.forEach(function (object) {
-            object.mesh.translateX(object.deltaX);
-            object.mesh.translateY(object.deltaY);
-            object.mesh.translateZ(object.deltaZ);
+            object.mesh.translateX(object.deltaX * deltaTime);
+            object.mesh.translateY(object.deltaY * deltaTime);
+            object.mesh.translateZ(object.deltaZ * deltaTime);
         });
 
     }
 
 
-    transformations() {
+    transformations(deltaTime) {
         this.objects.forEach(function (object) {
             // The scale factor that was applied to the object 
             var scaleFactor = object.mesh.scale;
@@ -198,9 +198,9 @@ export class ObjectManager {
             object.mesh.applyMatrix4(matrix);
 
             // Getting new scale value
-            object.deltaSX += object.deltaX;
-            object.deltaSY += object.deltaY;
-            object.deltaSX += object.deltaX;
+            object.deltaSX += object.deltaX * deltaTime;
+            object.deltaSY += object.deltaY * deltaTime;
+            object.deltaSX += object.deltaX * deltaTime;
             var scaleX = 1 + (Math.sin(object.deltaSX) / 2);
             var scaleY = 1 + (Math.sin(object.deltaSY) / 2);
             var scaleZ = 1 + (Math.sin(object.deltaSZ) / 2);
