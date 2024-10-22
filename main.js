@@ -74,7 +74,7 @@ class Main {
         this.directionalLight.position.set(50, -200, 0);
         this.directionalLight.castShadow = true;
         this.scene.add(this.directionalLight);
-      
+
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
@@ -83,58 +83,6 @@ class Main {
 
     animate() {
         this.stats.begin();
-        // Move the camera at a slow, forward steady velocity using delta time
-        for (let i = 0; i < this.views.length; i++) {
-            // Picking a camera to work with
-            const view = this.views[i];
-            const camera = view.camera;
-
-            // Parameters of the view port
-            const left = Math.floor(view.left * window.innerWidth);
-            const bottom = Math.floor(view.bottom * window.innerHeight);
-            const width = Math.floor(view.width * window.innerWidth);
-            const height = Math.floor(view.height * window.innerHeight);
-
-            // Setting the view port
-            this.renderer.setScissor(left, bottom, width, height);
-            this.renderer.setScissorTest(true);
-            this.renderer.setClearColor(view.background);
-
-
-            // Updating the camera and renderer
-            const deltaTime = this.clock.getDelta();
-            const speed = 50;
-
-            this.controls.update(deltaTime * speed);
-            this.renderer.render(this.scene, camera);
-        }
-
-        // handles window resizing 
-        window.addEventListener('resize', () => this.onWindowResize(), false);
-        window.addEventListener('keydown', (event) => this.keyDown(event), false);
-        window.addEventListener('keyup', (event) => this.keyUp(event), false);
-    }
-
-    animate() {
-      
-        // The time between animate() calls
-        const deltaTime = this.clock.getDelta();
-
-        // Move the camera at a slow, forward steady velocity using delta time
-        this.controls.update(deltaTime * this.cameraSpeed);
-
-        // Moves all the objects in a random linear direction
-        this.ObjectManager.drifting();
-
-        // Scales all the objects x, y, and z on a sin pattern
-        this.ObjectManager.transformations();
-
-        // Enable blending
-        this.ObjectManager.blend();
-
-        this.ObjectManager.loopObjects(this.ObjectManager.objects)
-        this.stats.end();
-    }
         // updating renderer
         this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
         this.renderer.render(this.scene, this.camera);
@@ -150,6 +98,30 @@ class Main {
         // Cast a ray from the main camera to check for intersection with the objects
         this.raycaster.setFromCamera(this.pointer, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+        // Updating the camera and renderer
+        const deltaTime = this.clock.getDelta();
+        const speed = 50;
+
+        // handles window resizing 
+        window.addEventListener('resize', () => this.onWindowResize(), false);
+        window.addEventListener('keydown', (event) => this.keyDown(event), false);
+        window.addEventListener('keyup', (event) => this.keyUp(event), false);
+
+        // Move the camera at a slow, forward steady velocity using delta time
+        this.controls.update(deltaTime * this.cameraSpeed);
+
+        // Moves all the objects in a random linear direction
+        this.ObjectManager.drifting();
+
+        // Scales all the objects x, y, and z on a sin pattern
+        this.ObjectManager.transformations();
+
+        // Enable blending
+        this.ObjectManager.blend();
+
+        this.ObjectManager.loopObjects(this.ObjectManager.objects)
+        this.stats.end();
 
         // Variable that acts as the camera look at direction
         var direction = new THREE.Vector3;
@@ -170,7 +142,8 @@ class Main {
 
         }
     }
-    
+
+
     /**
      * Bounce/send an object off by distance 
      * @param {THREE.Vector3} cameraDirection 
@@ -214,8 +187,10 @@ class Main {
             sound.setVolume(0.5);
             sound.play();
             sound.stop(2); // Stop after 2 seconds
-            
+
         });
     }
 }
+
+
 var game = new Main();
