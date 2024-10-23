@@ -23,7 +23,7 @@ class FirstPersonControls extends Controls {
 		this.lookSpeed = 0.005;
 
 		this.lookVertical = true;
-		this.autoForward = false;
+		this.autoForward = true;
 
 		this.activeLook = true;
 

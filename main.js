@@ -92,8 +92,6 @@ class Main {
 
         // handles window resizing 
         window.addEventListener('resize', () => this.onWindowResize(), false);
-        var axis = new THREE.AxesHelper();
-        this.scene.add(axis);
     }
 
     animate() {
@@ -102,17 +100,9 @@ class Main {
         // this.controls.update();
 
         // Move the camera at a slow, forward steady velocity using delta time
-        // this.controls.update(deltaTime * this.cameraSpeed);
+        this.controls.update(deltaTime * this.cameraSpeed);
 
-        
-
-        // // Scales all the objects x, y, and z on a sin pattern
-        this.ObjectManager.transformations(deltaTime);
-
-        this.ObjectManager.rotate(deltaTime);
-
-        // // Moves all the objects in a random linear direction
-        this.ObjectManager.linearDrifting(deltaTime);
+        this.ObjectManager.animate(deltaTime);
 
         // Updating camera and renderer
         for (let i = 0; i < this.views.length; i++) {
