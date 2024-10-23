@@ -51,23 +51,34 @@ export class ObjectManager {
         var shape = new THREE.Mesh(geometry, material);
         shape.castShadow = true; //default is false
         shape.receiveShadow = true; //default
-        switch (Math.floor(Math.random() * 2)) {
-            case 0:
-                var scaleStart = 2 * Math.PI;
-                break;
-            case 1:
-                var scaleStart = Math.PI;
-                break;
-        }
+
+        // Getting a parrallel axis
+        var axis = shape.position.clone();
+        axis.x += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
+        axis.y += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
+        axis.z += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
+
         var object = {
             mesh: shape,
+            // Which movement to apply
+            isLinear: this.getRandomBoolean(),
+            isOrbit: this.getRandomBoolean(),
+            isRotation: this.getRandomBoolean(),
+            isScale: this.getRandomBoolean(),
+            // Common change in axis (used to change values at a constant rate for all movement)
             deltaX: (Math.random() - 0.5) * 5,
             deltaY: (Math.random() - 0.5) * 5,
             deltaZ: (Math.random() - 0.5) * 5,
-            scaleOrigin: scaleStart,
-            deltaSX: scaleStart,
-            deltaSY: scaleStart,
-            deltaSZ: scaleStart
+            // Starting point of the scale on sin pattern (PI or 2Pi)
+            deltaSX: Math.PI * Math.ceil(Math.random() * 2),
+            deltaSY: Math.PI * Math.ceil(Math.random() * 2),
+            deltaSZ: Math.PI * Math.ceil(Math.random() * 2),
+            // Rotation direction + or -
+            rotationX: Math.sign(Math.random() - 0.5),
+            rotationY: Math.sign(Math.random() - 0.5),
+            rotationZ: Math.sign(Math.random() - 0.5),
+            // Axis that it will orbit around
+            parallelAxis: axis,
         }
         return object;
     }
@@ -123,6 +134,7 @@ export class ObjectManager {
             this.scene.add(star);
         }
     }
+
 
     /**
      * A function to "spawn" the objects with a random location without intersecting 
@@ -203,54 +215,69 @@ export class ObjectManager {
         };
         return uniform;
     }
-    
-    /**
-     * Moves the shape in a linear direction
-     * @param {*} deltaTime 
-     */
-    drifting(deltaTime) {
-        // For all the objects in the object pool
-        this.objects.forEach(function (object) {
-            object.mesh.translateX(object.deltaX * deltaTime);
-            object.mesh.translateY(object.deltaY * deltaTime);
-            object.mesh.translateZ(object.deltaZ * deltaTime);
-        });
-
-    }
 
 
-    transformations(deltaTime) {
-        this.objects.forEach(function (object) {
-            // The scale factor that was applied to the object 
-            var scaleFactor = object.mesh.scale;
-            // Make a copy of the object's original position
-            var position = new THREE.Vector3().copy(object.mesh.position)
-            // Moving object to origing for easier scaling
-            object.mesh.position.copy(new THREE.Vector3(0, 0, 0));
-
-            // Making scaler matrix
-            var matrix = new THREE.Matrix4();
-            // Reverting object to the original size
-            matrix.makeScale(1 / scaleFactor.x, 1 / scaleFactor.y, 1 / scaleFactor.z);
-            object.mesh.applyMatrix4(matrix);
-
-            // Getting new scale value
-            object.deltaSX += object.deltaX * deltaTime;
-            object.deltaSY += object.deltaY * deltaTime;
-            object.deltaSX += object.deltaX * deltaTime;
-            var scaleX = 1 + (Math.sin(object.deltaSX) / 2);
-            var scaleY = 1 + (Math.sin(object.deltaSY) / 2);
-            var scaleZ = 1 + (Math.sin(object.deltaSZ) / 2);
-
-            // Applying new scale
-            matrix.makeScale(scaleX, scaleY, scaleZ);
-            object.mesh.applyMatrix4(matrix);
-
-            // Moving object back to it's original position
-            object.mesh.position.copy(position);
+    // Calls the functions to move the object if they apply
+    animate(deltaTime) {
+        this.objects.forEach((object) => {
+            if (object.isLinear) {
+                this.linear(object, deltaTime);
+            }
+            if (object.isOrbit) {
+                this.orbit(object, deltaTime);
+            }
+            if (object.isRotation) {
+                this.rotation(object, deltaTime);
+            }
+            if (object.isScale) {
+                this.scale(object, deltaTime);
+            }
         });
     }
 
+    // Moves the object in a linear dirrection
+    linear(object, deltaTime) {
+        object.mesh.translateX(object.deltaX * deltaTime);
+        object.mesh.translateY(object.deltaY * deltaTime);
+        object.mesh.translateZ(object.deltaZ * deltaTime);
+    }
+
+    // Rotates the object in place
+    rotation(object, deltaTime) {
+        object.mesh.rotateX((object.rotationX * object.deltaX) * deltaTime);
+        object.mesh.rotateY((object.rotationY * object.deltaY) * deltaTime);
+        object.mesh.rotateZ((object.rotationZ * object.deltaZ) * deltaTime);
+    }
+
+    // Rotates the object on an axis
+    orbit(object, deltaTime) {
+        this.rotateAboutWorldAxis(object.mesh, object.parallelAxis, object.deltaX * deltaTime / 2);
+    }
+
+    // Changes the size of the object on the x, y, and z axis on a sin pattern
+    scale(object, deltaTime) {
+        // Make a copy of the object's original position
+        var position = object.mesh.position.clone();
+        // Moving object to origing for easier scaling
+        object.mesh.position.copy(0, 0, 0);
+
+        // Reverting object to the original size
+        object.mesh.scale.set(1, 1, 1);
+
+        // Getting new scale value
+        object.deltaSX += object.deltaX * deltaTime;
+        object.deltaSY += object.deltaY * deltaTime;
+        object.deltaSZ += object.deltaZ * deltaTime;
+        var scaleX = 1 + (Math.sin(object.deltaSX) / 2);
+        var scaleY = 1 + (Math.sin(object.deltaSY) / 2);
+        var scaleZ = 1 + (Math.sin(object.deltaSZ) / 2);
+
+        // Applying new scale
+        object.mesh.scale.set(scaleX, scaleY, scaleZ);
+
+        // Moving object back to it's original position
+        object.mesh.position.copy(position);
+    }
 
     /** Add blending for the objects */
     blend() {
@@ -260,6 +287,23 @@ export class ObjectManager {
             object.mesh.material.blendSrc = THREE.SrcColorFactor;
             object.mesh.material.blendDst = THREE.OneMinusSrcColorFactor;
         });
+    }
+
+    // Course Example 6
+    rotateAboutWorldAxis(object, axis, angle) {
+        var rotationMatrix = new THREE.Matrix4();
+        rotationMatrix.makeRotationAxis(axis.normalize(), angle);
+        var currentPos = new THREE.Vector4(object.position.x, object.position.y, object.position.z, 1);
+        var newPos = currentPos.applyMatrix4(rotationMatrix);
+        object.position.x = newPos.x;
+        object.position.y = newPos.y;
+        object.position.z = newPos.z;
+    }
+
+    // Returns random True or False
+    getRandomBoolean() {
+        // return true (greater than or equal to 0.5) or false (less than 0.5)
+        return Math.random() >= 0.5;
     }
 }
 

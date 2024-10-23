@@ -43,7 +43,7 @@ class Main {
                 bottom: 0.75,
                 width: (window.innerWidth - (window.innerWidth * 0.4)) / window.innerWidth,
                 height: (window.innerHeight - (window.innerHeight * 0.8)) / window.innerHeight,
-                background: 0x808080
+                background: 0x373737
             }
         ];
         // Creating the cameras
@@ -53,7 +53,7 @@ class Main {
             view.camera = camera;
             this.scene.add(camera);
         }
-        this.cameraSpeed = 50;
+        this.cameraSpeed = 20;
 
         // Flipping rear camera around
         this.views[1].camera.rotateY(Math.PI);
@@ -61,13 +61,17 @@ class Main {
         // Adding rear camera to front camera so they move together
         this.views[0].camera.add(this.views[1].camera);
         // Moving the camera to a desired intial position
-        this.views[0].camera.translateZ(200)
+        this.views[0].camera.translateZ(200);
 
         // this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
-        this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement)
+        this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement);
 
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
+
+        // Enable blending
+        this.ObjectManager.blend();
+
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
@@ -152,15 +156,7 @@ class Main {
         // Move the camera at a slow, forward steady velocity using delta time
         this.controls.update(deltaTime * this.cameraSpeed);
 
-
-        // Moves all the objects in a random linear direction
-        this.ObjectManager.drifting(deltaTime);
-
-        // Scales all the objects x, y, and z on a sin pattern
-        this.ObjectManager.transformations(deltaTime);
-
-        // Enable blending
-        this.ObjectManager.blend();
+        this.ObjectManager.animate(deltaTime);
 
         // Updating camera and renderer
         for (let i = 0; i < this.views.length; i++) {
@@ -235,6 +231,5 @@ class Main {
         });
     }
 }
-
 
 var game = new Main();
