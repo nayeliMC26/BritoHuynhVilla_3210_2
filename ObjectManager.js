@@ -1,8 +1,14 @@
 import * as THREE from 'three';
-import vertexS from './shaders/vertexShader';
-import fragmentS from './shaders/fragmentShader';
 
+/**
+ * Handles all of the objects in space.
+ */
 export class ObjectManager {
+    /**
+     * Creates a scene and a camera.
+     * @param {THREE.Scene} scene 
+     * @param {THREE.Camera} camera 
+     */
     constructor(scene, camera) {
         this.scene = scene;
         this.camera = camera;
@@ -13,7 +19,9 @@ export class ObjectManager {
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
     }
-    // function which just creates our object pool which we will be reusing
+    /**
+     * A function that creates an object pool.
+     */
     createObjectPool() {
         // for loop based on the limit of objects
         for (var i = 0; i < this.objectsMax; i++) {
@@ -26,15 +34,20 @@ export class ObjectManager {
             this.scaleFactors.push([1, 1, 1]);
             this.scene.add(randomObject.mesh);
         }
-        //callthe random position function our list of objects
-        this.randomPosition(this.objects)
+        //call the random position function our list of objects
+        this.randomPosition(this.objects);
 
     }
-    // function to create random objects (takes random geometry as an input to create random objects)
+    //  
+    /**
+     * A function to create random objects (takes random geometry as an input to create random objects)
+     * @returns a random object
+     */
     createRandomObject() {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+
         var shape = new THREE.Mesh(geometry, material);
         shape.castShadow = true; //default is false
         shape.receiveShadow = true; //default
@@ -67,11 +80,11 @@ export class ObjectManager {
             // Axis that it will orbit around
             parallelAxis: axis,
         }
-        return object
+        return object;
     }
 
-    // function which is just a list of geometries and randomly returns a geometry 
     /**
+     * A function that returns a random geometry shape
      * @returns Random geometry
      */
     randomGeometries() {
@@ -96,11 +109,23 @@ export class ObjectManager {
 
             var starGeometry = new THREE.OctahedronGeometry(0.5, 0);
 
-            // Create a material for each star (basic color, can be customized)
-            var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            // Uniforms to pass to the fragment shader.
+            var starUniforms = {
+                fColor: { type: "v3", value: new THREE.Vector3(1.0, 1.0, 1.0) },
+                delta: { value: 0 }
+            }; // fColor: white color
+
+            // Create a shader material for each star
+            this.starMaterial = new THREE.ShaderMaterial(
+                {
+                    uniforms: starUniforms,
+                    fragmentShader: document.getElementById('fragmentShader').textContent
+                }
+            );
+            //var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
             // Create a mesh by combining the geometry and material
-            var star = new THREE.Mesh(starGeometry, starMaterial);
+            var star = new THREE.Mesh(starGeometry, this.starMaterial);
 
             // Set the position of the star randomly in 3D space
             star.position.set(x, y, z);
@@ -110,7 +135,11 @@ export class ObjectManager {
         }
     }
 
-    // function to "spawn" the objects with a random location without intersecting 
+
+    /**
+     * A function to "spawn" the objects with a random location without intersecting 
+     * @param {Array} objects the list of objects that have been added
+     */
     randomPosition(objects) {
         // for every object in the array of random objects made 
         for (var i = 0; i < objects.length; i++) {
@@ -144,6 +173,10 @@ export class ObjectManager {
         }
     }
 
+    /**
+     * 
+     * @param {*} objects 
+     */
     loopObjects(objects) {
 
         // for all objects in our objectPool
@@ -155,7 +188,7 @@ export class ObjectManager {
                 // if the position of the object is within 200 units behind the camera
                 if (object.mesh.position.z > this.camera.position.z + 200) {
                     // move the objects back by a number between 500 and 1000
-                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500,1000));
+                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500, 1000));
 
 
                 }
@@ -163,7 +196,10 @@ export class ObjectManager {
         }
     }
 
-    // generates random uniform values
+    /**
+     * Generates random uniform values.
+     * @returns a random uniform value
+     */
     randomUniforms() {
         var uniform = {
             // The difference in coordinates
@@ -180,6 +216,7 @@ export class ObjectManager {
         return uniform;
     }
 
+
     // Calls the functions to move the object if they apply
     animate(deltaTime) {
         this.objects.forEach((object) => {
@@ -195,7 +232,6 @@ export class ObjectManager {
             if (object.isScale) {
                 this.scale(object, deltaTime);
             }
-        });
     }
 
     // Moves the object in a linear dirrection

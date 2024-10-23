@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
-import { Reflector } from 'three/addons/objects/Reflector.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import Stats from 'three/examples/jsm/libs/stats.module'
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 class Main {
+    /**
+     * Creates the scene, camera, renderer, and dashboard.
+     */
     constructor() {
         // adding scene, camera, renderer, making necessary adjustments
         this.scene = new THREE.Scene();
@@ -51,7 +53,7 @@ class Main {
             view.camera = camera;
             this.scene.add(camera);
         }
-        this.cameraSpeed = 20;
+        this.cameraSpeed = 50;
 
         // Flipping rear camera around
         this.views[1].camera.rotateY(Math.PI);
@@ -66,8 +68,10 @@ class Main {
 
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
+
         // Enable blending
         this.ObjectManager.blend();
+
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
@@ -85,7 +89,7 @@ class Main {
         this.scene.add(this.directionalLight);
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
-      
+
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
@@ -96,7 +100,7 @@ class Main {
          * 
          * "Fancy Victorian Square Picture Frame" (https://skfb.ly/6ZIHt) by Jamie McFarlane is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
         */
-         
+
         this.loader = new GLTFLoader();
         // load in the model from the assets folder
         this.loader.load(
@@ -105,7 +109,7 @@ class Main {
                 this.model = gltf.scene;
                 this.scene.add(this.model);
                 // position the model such that we are looking through the window of the ship
-                this.model.position.set(0, -1, -0.78);
+                this.model.position.set(0, -1, -1.7);
                 // model is loaded in facing the wrong way so we rotate it
                 this.model.rotation.y = Math.PI;
                 this.views[0].camera.add(this.model);
@@ -114,17 +118,21 @@ class Main {
         )
     }
 
+    /**
+     * Move the camera, check for collision.
+     */
     animate() {
         this.stats.begin();
 
+        // Updating the camera and renderer
+        const deltaTime = this.clock.getDelta();
+
+        // Create a point from the main camera looking straight
         this.pointer = new THREE.Vector3(0, 0, 1);
 
         // Cast a ray from the main camera to check for intersection with the objects
         this.raycaster.setFromCamera(this.pointer, this.views[0].camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-
-        // Updating the camera and renderer
-        const deltaTime = this.clock.getDelta();
 
         // Variable that acts as the camera look at direction
         var direction = new THREE.Vector3;
@@ -169,7 +177,7 @@ class Main {
             this.renderer.render(this.scene, camera);
         }
 
-        this.ObjectManager.loopObjects(this.ObjectManager.objects)
+        this.ObjectManager.loopObjects(this.ObjectManager.objects);
         this.stats.end();
     }
 
@@ -188,7 +196,9 @@ class Main {
             setTimeout(() => { object.translateOnAxis(cameraDirection, 5); }, i * 10); // Move the object each 10 ms
         }
     }
-    // defines the function of windowResizing
+    /**
+     * defines the function of windowResizing
+     */
     onWindowResize() {
         this.views.forEach(function (view) {
             const camera = view.camera;
