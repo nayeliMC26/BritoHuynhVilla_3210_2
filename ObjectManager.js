@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import vertexS from './shaders/vertexShader';
-import fragmentS from './shaders/fragmentShader';
 
 export class ObjectManager {
     constructor(scene, camera) {
@@ -26,7 +24,7 @@ export class ObjectManager {
             this.scaleFactors.push([1, 1, 1]);
             this.scene.add(randomObject.mesh);
         }
-        //callthe random position function our list of objects
+        //call the random position function our list of objects
         this.randomPosition(this.objects)
 
     }
@@ -35,6 +33,17 @@ export class ObjectManager {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+
+        var customUniforms = { 
+            delta: { value: 0 }
+        };
+        var material2  = new THREE.ShaderMaterial(
+            {
+                uniforms: customUniforms,
+                vertexShader: document.getElementById('vertexShader').textContent
+            }
+        );
+
         var shape = new THREE.Mesh(geometry, material);
         shape.castShadow = true; //default is false
         shape.receiveShadow = true; //default
@@ -85,8 +94,19 @@ export class ObjectManager {
 
             var starGeometry = new THREE.OctahedronGeometry(0.5, 0);
 
-            // Create a material for each star (basic color, can be customized)
-            var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            // Uniforms to pass to the fragment shader.
+            var starUniforms = {
+                fColor: { type: "v3", value: new THREE.Vector3(1.0, 1.0, 1.0) }
+            }; // fColor: white color
+
+            // Create a shader material for each star
+            var starMaterial = new THREE.ShaderMaterial(
+                {
+                    uniforms: starUniforms,
+                    fragmentShader: document.getElementById('fragmentShader').textContent
+                }
+            );
+            //var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
             // Create a mesh by combining the geometry and material
             var star = new THREE.Mesh(starGeometry, starMaterial);
@@ -145,7 +165,7 @@ export class ObjectManager {
                 // if the position of the object is within 200 units behind the camera
                 if (object.mesh.position.z > this.camera.position.z + 200) {
                     // move the objects back by a number between 500 and 1000
-                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500,1000));
+                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500, 1000));
 
 
                 }
