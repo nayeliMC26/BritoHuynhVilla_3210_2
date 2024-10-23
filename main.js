@@ -2,9 +2,12 @@ import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import Stats from 'three/examples/jsm/libs/stats.module'
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 class Main {
+    /**
+     * Creates the scene, camera, renderer, and dashboard.
+     */
     constructor() {
         // adding scene, camera, renderer, making necessary adjustments
         this.scene = new THREE.Scene();
@@ -111,6 +114,9 @@ class Main {
         )
     }
 
+    /**
+     * Move the camera, check for collision.
+     */
     animate() {
         this.stats.begin();
 
@@ -118,7 +124,6 @@ class Main {
         const deltaTime = this.clock.getDelta();
 
         // Create a point from the main camera looking straight
-
         this.pointer = new THREE.Vector3(0, 0, 1);
 
         // Cast a ray from the main camera to check for intersection with the objects
@@ -176,7 +181,7 @@ class Main {
             this.renderer.render(this.scene, camera);
         }
 
-        this.ObjectManager.loopObjects(this.ObjectManager.objects)
+        this.ObjectManager.loopObjects(this.ObjectManager.objects);
         this.stats.end();
     }
 
@@ -195,7 +200,9 @@ class Main {
             setTimeout(() => { object.translateOnAxis(cameraDirection, 5); }, i * 10); // Move the object each 10 ms
         }
     }
-    // defines the function of windowResizing
+    /**
+     * defines the function of windowResizing
+     */
     onWindowResize() {
         this.views.forEach(function (view) {
             const camera = view.camera;

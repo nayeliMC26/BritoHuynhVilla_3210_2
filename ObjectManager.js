@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 
+/**
+ * Handles all of the objects in space.
+ */
 export class ObjectManager {
+    /**
+     * Creates a scene and a camera.
+     * @param {THREE.Scene} scene 
+     * @param {THREE.Camera} camera 
+     */
     constructor(scene, camera) {
         this.scene = scene;
         this.camera = camera;
@@ -11,7 +19,9 @@ export class ObjectManager {
         // call our createObjectPool function to create an objectPool 
         this.createObjectPool();
     }
-    // function which just creates our object pool which we will be reusing
+    /**
+     * A function that creates an object pool.
+     */
     createObjectPool() {
         // for loop based on the limit of objects
         for (var i = 0; i < this.objectsMax; i++) {
@@ -25,10 +35,14 @@ export class ObjectManager {
             this.scene.add(randomObject.mesh);
         }
         //call the random position function our list of objects
-        this.randomPosition(this.objects)
+        this.randomPosition(this.objects);
 
     }
-    // function to create random objects (takes random geometry as an input to create random objects)
+    //  
+    /**
+     * A function to create random objects (takes random geometry as an input to create random objects)
+     * @returns a random object
+     */
     createRandomObject() {
         // for the geometry use the randomGeometries function
         var geometry = this.randomGeometries();
@@ -55,11 +69,11 @@ export class ObjectManager {
             deltaSY: scaleStart,
             deltaSZ: scaleStart
         }
-        return object
+        return object;
     }
 
-    // function which is just a list of geometries and randomly returns a geometry 
     /**
+     * A function that returns a random geometry shape
      * @returns Random geometry
      */
     randomGeometries() {
@@ -110,8 +124,10 @@ export class ObjectManager {
         }
     }
 
-
-    // function to "spawn" the objects with a random location without intersecting 
+    /**
+     * A function to "spawn" the objects with a random location without intersecting 
+     * @param {Array} objects the list of objects that have been added
+     */
     randomPosition(objects) {
         // for every object in the array of random objects made 
         for (var i = 0; i < objects.length; i++) {
@@ -145,6 +161,10 @@ export class ObjectManager {
         }
     }
 
+    /**
+     * 
+     * @param {*} objects 
+     */
     loopObjects(objects) {
 
         // for all objects in our objectPool
@@ -164,7 +184,10 @@ export class ObjectManager {
         }
     }
 
-    // generates random uniform values
+    /**
+     * Generates random uniform values.
+     * @returns a random uniform value
+     */
     randomUniforms() {
         var uniform = {
             // The difference in coordinates
@@ -180,8 +203,11 @@ export class ObjectManager {
         };
         return uniform;
     }
-
-    // Moves the shape in a linear direction
+    
+    /**
+     * Moves the shape in a linear direction
+     * @param {*} deltaTime 
+     */
     drifting(deltaTime) {
         // For all the objects in the object pool
         this.objects.forEach(function (object) {
