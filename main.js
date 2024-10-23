@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
-import { Reflector } from 'three/addons/objects/Reflector.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module'
@@ -51,11 +50,6 @@ class Main {
             view.camera = camera;
             this.scene.add(camera);
         }
-        this.cameraSpeed = 20;
-
-        // Setting up the camera 
-        this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000);
-        this.scene.add(this.camera);
         this.cameraSpeed = 50;
 
         // Flipping rear camera around
@@ -70,7 +64,7 @@ class Main {
         this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement)
 
         // creating a new objectManager object 
-        this.ObjectManager = new ObjectManager(this.scene, this.camera);
+        this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
 
         // Used to calculate delta time
         this.clock = new THREE.Clock();
@@ -88,7 +82,7 @@ class Main {
         this.scene.add(this.directionalLight);
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
-      
+
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
@@ -99,7 +93,7 @@ class Main {
          * 
          * "Fancy Victorian Square Picture Frame" (https://skfb.ly/6ZIHt) by Jamie McFarlane is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
         */
-         
+
         this.loader = new GLTFLoader();
         // load in the model from the assets folder
         this.loader.load(
@@ -108,10 +102,10 @@ class Main {
                 this.model = gltf.scene;
                 this.scene.add(this.model);
                 // position the model such that we are looking through the window of the ship
-                this.model.position.set(0, -1, -0.78);
+                this.model.position.set(0, -1, -1.7);
                 // model is loaded in facing the wrong way so we rotate it
                 this.model.rotation.y = Math.PI;
-                this.camera.add(this.model);
+                this.views[0].camera.add(this.model);
 
             }
         )
@@ -119,24 +113,17 @@ class Main {
 
     animate() {
         this.stats.begin();
-        // updating renderer
-        this.renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
-        this.renderer.render(this.scene, this.camera);
-        // Rendering the rear view mirror
-        this.mirror.visible = true;
-        this.renderer.setScissor(...this.mirrorBounds);
-        this.renderer.render(this.scene, this.camera);
-        this.mirror.visible = false;
+
+        // Updating the camera and renderer
+        const deltaTime = this.clock.getDelta();
+
         // Create a point from the main camera looking straight
 
         this.pointer = new THREE.Vector3(0, 0, 1);
 
         // Cast a ray from the main camera to check for intersection with the objects
-        this.raycaster.setFromCamera(this.pointer, this.camera);
+        this.raycaster.setFromCamera(this.pointer, this.views[0].camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-
-        // Updating the camera and renderer
-        const deltaTime = this.clock.getDelta();
 
         // Variable that acts as the camera look at direction
         var direction = new THREE.Vector3;
@@ -148,7 +135,7 @@ class Main {
             if (intersects[i].distance > 1 && intersects[i].distance < 10) {
 
                 // Getting the camera look at direction
-                this.camera.getWorldDirection(direction);
+                this.views[0].camera.getWorldDirection(direction);
                 direction.normalize();
                 // Send the object away from the camera
                 this.bounceObject(direction, intersects[i].object, 200);
@@ -227,7 +214,7 @@ class Main {
      */
     playSound(audioFile) {
         const listener = new THREE.AudioListener();
-        this.camera.add(listener);
+        this.views[0].camera.add(listener);
         // Create a global audio source
         const sound = new THREE.Audio(listener);
         const audioLoader = new THREE.AudioLoader();
