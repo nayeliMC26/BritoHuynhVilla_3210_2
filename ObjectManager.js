@@ -34,16 +34,6 @@ export class ObjectManager {
         var geometry = this.randomGeometries();
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
 
-        var customUniforms = { 
-            delta: { value: 0 }
-        };
-        var material2  = new THREE.ShaderMaterial(
-            {
-                uniforms: customUniforms,
-                vertexShader: document.getElementById('vertexShader').textContent
-            }
-        );
-
         var shape = new THREE.Mesh(geometry, material);
         shape.castShadow = true; //default is false
         shape.receiveShadow = true; //default
@@ -96,20 +86,22 @@ export class ObjectManager {
 
             // Uniforms to pass to the fragment shader.
             var starUniforms = {
-                fColor: { type: "v3", value: new THREE.Vector3(1.0, 1.0, 1.0) }
+                fColor: { type: "v3", value: new THREE.Vector3(1.0, 1.0, 1.0) },
+                delta: { value: 0 }
             }; // fColor: white color
 
             // Create a shader material for each star
-            var starMaterial = new THREE.ShaderMaterial(
+            this.starMaterial = new THREE.ShaderMaterial(
                 {
                     uniforms: starUniforms,
-                    fragmentShader: document.getElementById('fragmentShader').textContent
+                    fragmentShader: document.getElementById('fragmentShader').textContent,
+                    vertexShader: document.getElementById('vertexShader').textContent
                 }
             );
             //var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
             // Create a mesh by combining the geometry and material
-            var star = new THREE.Mesh(starGeometry, starMaterial);
+            var star = new THREE.Mesh(starGeometry, this.starMaterial);
 
             // Set the position of the star randomly in 3D space
             star.position.set(x, y, z);
