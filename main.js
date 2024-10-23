@@ -53,7 +53,7 @@ class Main {
             view.camera = camera;
             this.scene.add(camera);
         }
-        this.cameraSpeed = 50;
+        this.cameraSpeed = 20;
 
         // Flipping rear camera around
         this.views[1].camera.rotateY(Math.PI);

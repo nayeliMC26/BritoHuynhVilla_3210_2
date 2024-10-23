@@ -232,6 +232,7 @@ export class ObjectManager {
             if (object.isScale) {
                 this.scale(object, deltaTime);
             }
+        });
     }
 
     // Moves the object in a linear dirrection
