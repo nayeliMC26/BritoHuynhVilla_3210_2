@@ -94,8 +94,7 @@ export class ObjectManager {
             this.starMaterial = new THREE.ShaderMaterial(
                 {
                     uniforms: starUniforms,
-                    fragmentShader: document.getElementById('fragmentShader').textContent,
-                    vertexShader: document.getElementById('vertexShader').textContent
+                    fragmentShader: document.getElementById('fragmentShader').textContent
                 }
             );
             //var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
