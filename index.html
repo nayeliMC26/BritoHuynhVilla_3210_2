@@ -29,25 +29,6 @@
         </div>
     </div>
 
-    <!-- Vertex shader GLSL script. -->
-    <script id="vertexShader" type="x-shader/x-vertex">
-        uniform float deltaTime;
-
-        void main()
-        {
-            gl_Position = vec4(0, 0, 0, 1.0); 
-        }
-    </script>
-
-    <!-- Fragment shader GLSL script. -->
-    <script id="fragmentShader" type="x-shader/x-fragment">
-        uniform vec3 fColor;
-        void main()
-        {
-            gl_FragColor = vec4(fColor, 1.0);
-        }
-    </script>
-
     <!-- Main project script. -->
     <script type="module" src="/main.js"></script>
 </body>
