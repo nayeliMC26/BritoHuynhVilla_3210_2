@@ -56,6 +56,7 @@ export class ObjectManager {
         axis.y += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
         axis.z += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
 
+        // Json to make working with the object easier
         var object = {
             mesh: shape,
             // Which movement to apply
@@ -76,7 +77,7 @@ export class ObjectManager {
             rotationY: Math.sign(Math.random() - 0.5),
             rotationZ: Math.sign(Math.random() - 0.5),
             // Axis that it will orbit around
-            parallelAxis: axis,
+            parallelAxis: axis
         }
         return object;
     }
@@ -150,7 +151,6 @@ export class ObjectManager {
                 if (object.mesh.position.z > this.camera.position.z + 200) {
                     // move the objects back by a number between 500 and 1000
                     object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500, 1000));
-
 
                 }
             }

@@ -4,6 +4,8 @@ Group Members: Wander Brito Martinez, William Huynh, Nayeli Villa
 
 [Kanban Board](https://trello.com/b/CePXuQUr/csc3210britohuynhvilla2)
 
+Sprites from https://github.com/mrdoob/three.js/tree/master/examples/textures/sprites
+
 ## Instructions
 
 - Download Extension: Comment tagged templates, https://marketplace.visualstudio.com/items?itemName=bierner.comment-tagged-templates
