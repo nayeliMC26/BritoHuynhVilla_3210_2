@@ -15,4 +15,4 @@ void main() {
     gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
 } 
 `;
-export default fragment
+export default fragment;

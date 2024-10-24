@@ -24,6 +24,7 @@ class Main {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.BasicShadowMap;
         document.getElementById('canvas').appendChild(this.renderer.domElement);
+
         // Added a start button that allows the GUI canvas to be disabled once the game starts
         this.startButton = document.getElementById('startButton');
         // Pause menu for when the user presses escape
@@ -43,7 +44,7 @@ class Main {
             }
 
         });
-
+        
         window.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 this.togglePause();
@@ -186,8 +187,6 @@ class Main {
 
         // Check each object for collision with the plane (the camera)
         for (let i = 0; i < intersects.length; i++) {
-
-
             // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera and 
             // that it's not colliding with a star
             if (intersects[i].distance > 1 && intersects[i].distance < 10 && !intersects[i].object.isPoints) {
@@ -198,7 +197,6 @@ class Main {
                 this.bounceObject(direction, intersects[i].object, 200);
                 break;
             }
-
         }
 
         // Moving the objects
@@ -235,12 +233,12 @@ class Main {
 
     /**
      * Bounce/send an object off by distance 
-     * @param {THREE.Vector3} cameraDirection 
-     * @param {THREE.Object3D} object 
-     * @param {Number} distance 
+     * @param {THREE.Vector3} cameraDirection the lookAt direction
+     * @param {THREE.Object3D} object the object to be moved
+     * @param {Number} distance the time given for the object to move
      */
     bounceObject(cameraDirection, object, distance) {
-        // Play a "boing" sound
+        // Play a bounce sound
         this.playSound('assets/sounds/boing.mp3');
         // Timeout code adapted from https://www.sitepoint.com/delay-sleep-pause-wait/
         for (let i = 0; i < distance; i++) {
