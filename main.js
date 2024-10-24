@@ -24,6 +24,10 @@ class Main {
         document.getElementById('canvas').appendChild(this.renderer.domElement);
         // Added a start button that allows the GUI canvas to be disabled once the game starts
         this.startButton = document.getElementById('startButton');
+        // Pause menu for when the user presses escape
+        this.pauseMenu = document.getElementById('pauseMenu');
+        // Button to allow them to return to the game
+        this.resumeButton = document.getElementById('resumeButton');
         this.startButton.addEventListener('click', () => {
             this.guiCanvas = document.querySelector('#guiCanvas');
             this.guiContainer = document.querySelector('.gui-container');
@@ -35,6 +39,16 @@ class Main {
                 this.guiContainer.style.display = 'none';
             }
 
+        });
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                this.togglePause();
+            }
+        });
+
+        this.resumeButton.addEventListener('click', () => {
+            this.togglePause();
         });
 
         // Object with the required information for each camera
@@ -130,6 +144,8 @@ class Main {
 
             }
         )
+
+        this.paused = false;
     }
 
     /**
@@ -137,8 +153,9 @@ class Main {
      */
     animate() {
         // Flag to return if the game is not in the started state
-        if (!this.gameStarted) {
-            return; 
+        if (!this.gameStarted || this.paused) {
+            this.stats.end();
+            return;
         }
 
         this.stats.begin();
@@ -216,7 +233,7 @@ class Main {
         }
     }
     /**
-     * defines the function of windowResizing
+     * Defines the function of windowResizing
      */
     onWindowResize() {
         this.views.forEach(function (view) {
@@ -245,10 +262,24 @@ class Main {
             sound.setLoop(false);
             sound.setVolume(0.3);
             sound.play();
-            sound.stop(57); 
+            sound.stop(57);
 
         });
     }
+
+    /**
+     * Function to toggle pausing for users
+     */
+    togglePause() {
+        this.paused = !this.paused;
+        if (this.paused) {
+            this.pauseMenu.style.display = 'flex';  // Show pause menu
+        } else {
+            this.pauseMenu.style.display = 'none';  // Hide pause menu
+        }
+    }
 }
+
+
 
 var game = new Main();
