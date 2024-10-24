@@ -11,17 +11,31 @@ class Main {
     constructor() {
         // adding scene, camera, renderer, making necessary adjustments
         this.scene = new THREE.Scene();
+        this.gameStarted = false;
 
         // Setting up the renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.animate());
-        // nice gray color to start with :)
         this.renderer.setClearColor(0x272727);
         this.renderer.setScissorTest(true);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.BasicShadowMap;
-        document.body.appendChild(this.renderer.domElement);
+        document.getElementById('canvas').appendChild(this.renderer.domElement);
+        // Added a start button that allows the GUI canvas to be disabled once the game starts
+        this.startButton = document.getElementById('startButton');
+        this.startButton.addEventListener('click', () => {
+            this.guiCanvas = document.querySelector('#guiCanvas');
+            this.guiContainer = document.querySelector('.gui-container');
+            this.gameStarted = true;
+            this.playSound('assets/sounds/space-station-247790.mp3');
+
+            if (this.guiCanvas && this.guiContainer) {
+                this.guiCanvas.style.display = 'none';
+                this.guiContainer.style.display = 'none';
+            }
+
+        });
 
         // Object with the required information for each camera
         this.views = [
@@ -93,7 +107,7 @@ class Main {
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
-
+        
         /*"Cockpit Model Vr" (https://skfb.ly/6QTwx) by chiefpad 
          * is licensed under Creative Commons Attribution 
          * (http://creativecommons.org/licenses/by/4.0/). 
@@ -122,6 +136,11 @@ class Main {
      * Move the camera, check for collision.
      */
     animate() {
+        // Flag to return if the game is not in the started state
+        if (!this.gameStarted) {
+            return; 
+        }
+
         this.stats.begin();
 
         // Updating the camera and renderer
@@ -224,9 +243,9 @@ class Main {
         audioLoader.load(audioFile, function (buffer) {
             sound.setBuffer(buffer);
             sound.setLoop(false);
-            sound.setVolume(0.5);
+            sound.setVolume(0.3);
             sound.play();
-            sound.stop(2); // Stop after 2 seconds
+            sound.stop(57); 
 
         });
     }

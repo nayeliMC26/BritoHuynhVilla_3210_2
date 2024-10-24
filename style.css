@@ -1,0 +1,68 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+#canvas {
+    background: linear-gradient( 145deg, rgb(44, 84, 146)0%, rgb(45, 11, 65)100%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    z-index: 0;
+}
+
+.gui-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+#guiCanvas {
+    background-image: url("https://img.freepik.com/free-photo/ultra-detailed-nebula-abstract-wallpaper-4_1562-749.jpg");
+    background-size: cover;
+    width: 600px;
+    height: 500px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: rgb(255, 255, 255);
+    box-shadow: grey 5px 5px 20px 0px;
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.gui-content {
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+}
+
+#startButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: rgb(41, 12, 38);
+    color: rgb(255, 255, 255);
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+#startButton:hover {
+    background-color: rgb(200, 200, 200);
+}
