@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
+import { Stars } from './Stars.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 class Main {
     /**
@@ -69,6 +71,8 @@ class Main {
         // creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
 
+        this.Stars = new Stars(this.scene);
+
         // Enable blending
         this.ObjectManager.blend();
 
@@ -79,7 +83,6 @@ class Main {
         // Create a raycaster to detect collisions with objects
         this.raycaster = new THREE.Raycaster();
 
-        this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(this.ambientLight);
 
@@ -103,29 +106,36 @@ class Main {
 
         this.loader = new GLTFLoader();
         // load in the model from the assets folder
-        this.loader.load(
-            'assets/models/source/cockpit_model_vr.gltf',
-            (gltf) => {
-                this.model = gltf.scene;
-                this.scene.add(this.model);
-                // position the model such that we are looking through the window of the ship
-                this.model.position.set(0, -1, -1.7);
-                // model is loaded in facing the wrong way so we rotate it
-                this.model.rotation.y = Math.PI;
-                this.views[0].camera.add(this.model);
+        // this.loader.load(
+        //     'assets/models/source/cockpit_model_vr.gltf',
+        //     (gltf) => {
+        //         this.model = gltf.scene;
+        //         this.scene.add(this.model);
+        //         // position the model such that we are looking through the window of the ship
+        //         this.model.position.set(0, -1, -1.7);
+        //         // model is loaded in facing the wrong way so we rotate it
+        //         this.model.rotation.y = Math.PI;
+        //         this.views[0].camera.add(this.model);
 
-            }
-        )
+        //     }
+        // )
+
+        var helper = new THREE.AxesHelper();
+        this.scene.add(helper);
     }
 
     /**
      * Move the camera, check for collision.
      */
     animate() {
+        // Fps reporter
         this.stats.begin();
 
         // Updating the camera and renderer
         const deltaTime = this.clock.getDelta();
+
+        // Move the camera at a slow, forward steady velocity using delta time
+        this.controls.update(deltaTime * this.cameraSpeed);
 
         // Create a point from the main camera looking straight
         this.pointer = new THREE.Vector3(0, 0, 1);
@@ -153,10 +163,13 @@ class Main {
 
         }
 
-        // Move the camera at a slow, forward steady velocity using delta time
-        this.controls.update(deltaTime * this.cameraSpeed);
+        // Moving the objects
+        // this.ObjectManager.animate(deltaTime);
 
-        this.ObjectManager.animate(deltaTime);
+        this.Stars.update();
+
+        // Makes it feel like an "infinity" amount of objects
+        // this.ObjectManager.loopObjects(this.ObjectManager.objects);
 
         // Updating camera and renderer
         for (let i = 0; i < this.views.length; i++) {
@@ -177,7 +190,7 @@ class Main {
             this.renderer.render(this.scene, camera);
         }
 
-        this.ObjectManager.loopObjects(this.ObjectManager.objects);
+        // Fps reporter
         this.stats.end();
     }
 
