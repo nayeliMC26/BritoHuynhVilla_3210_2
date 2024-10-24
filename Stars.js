@@ -20,7 +20,7 @@ export class Stars {
         this.positions = [];
         // Holds the colors of every star
         this.colors = [];
-        // Available colors to chooce from
+        // Available colors to choose from
         this.starColors = [
             0xdeebff,
             0xffe07a,
@@ -108,11 +108,11 @@ export class Stars {
 
         // Current position of the camera
         const newCameraPosition = this.camera.position.clone();
-        // The distacement between the original position and current position of the camera
+        // The displacement between the original position and current position of the camera
         const displacement = new THREE.Vector3().subVectors(newCameraPosition, this.cameraPosition);
         // A translation matrix with the values of the displacement
         const matrix = new THREE.Matrix4().makeTranslation(displacement);
-        // Applying the displacemnet of the camera to the stars
+        // Applying the displacement of the camera to the stars
         this.stars.applyMatrix4(matrix);
         // Updating the original position of the camera to the current position
         this.cameraPosition.copy(newCameraPosition);

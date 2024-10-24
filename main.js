@@ -19,6 +19,7 @@ class Main {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.animate());
         this.renderer.setClearColor(0x272727);
+        // Scissor rasterization
         this.renderer.setScissorTest(true);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.BasicShadowMap;
@@ -56,9 +57,10 @@ class Main {
         // Object with the required information for each camera
         this.views = [
             {
+                // Front camera (main camera)
                 camera: "",
                 inverted: false,
-                // The parameters of the view port (percetages of the screen)
+                // The parameters of the view port (percentages of the screen)
                 left: 0,
                 bottom: 0,
                 width: 1,
@@ -66,9 +68,10 @@ class Main {
                 background: 0x272727
             },
             {
+                // Rear-view camera
                 camera: "",
                 inverted: true,
-                // The parameters of the view port (percetages of the screen)
+                // The parameters of the view port (percentages of the screen)
                 left: 0.2,
                 bottom: 0.75,
                 width: (window.innerWidth - (window.innerWidth * 0.4)) / window.innerWidth,
@@ -91,7 +94,7 @@ class Main {
         this.views[1].camera.projectionMatrix.elements[0] *= -1;
         // Adding rear camera to front camera so they move together
         this.views[0].camera.add(this.views[1].camera);
-        // Moving the camera to a desired intial position
+        // Moving the camera to a desired initial position
         this.views[0].camera.translateZ(200);
 
         // Manages movement of the mouse
@@ -106,11 +109,10 @@ class Main {
         // Enable blending
         this.ObjectManager.blend();
 
-
         // Used to calculate delta time
         this.clock = new THREE.Clock();
 
-        // Create a raycaster to detect collisions with objects
+        // Create a ray caster to detect collisions with objects
         this.raycaster = new THREE.Raycaster();
 
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -121,11 +123,10 @@ class Main {
         this.directionalLight.castShadow = true;
         this.scene.add(this.directionalLight);
 
-
-        // Fps reporter
-        this.stats = Stats()
-        this.stats.showPanel(0)
-        document.body.appendChild(this.stats.dom)
+        // FPS reporter
+        this.stats = Stats();
+        this.stats.showPanel(0);
+        document.body.appendChild(this.stats.dom);
         
         /*"Cockpit Model Vr" (https://skfb.ly/6QTwx) by chiefpad 
          * is licensed under Creative Commons Attribution 
@@ -145,10 +146,8 @@ class Main {
                 // model is loaded in facing the wrong way so we rotate it
                 this.model.rotation.y = Math.PI;
                 this.views[0].camera.add(this.model);
-
             }
         )
-
 
         // Handles window resize
         window.addEventListener('resize', () => this.onWindowResize(), false);
@@ -190,9 +189,8 @@ class Main {
 
 
             // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera and 
-            // that it's not colliding wiht a star
+            // that it's not colliding with a star
             if (intersects[i].distance > 1 && intersects[i].distance < 10 && !intersects[i].object.isPoints) {
-
                 // Getting the camera look at direction
                 this.views[0].camera.getWorldDirection(direction);
                 direction.normalize();
@@ -206,7 +204,7 @@ class Main {
         // Moving the objects
         this.ObjectManager.animate(deltaTime);
 
-        // Keeps the backgroudn in constant movement
+        // Keeps the background in constant movement
         this.StarsBackground.update();
 
         // Makes it feel like an "infinity" amount of objects
@@ -235,7 +233,6 @@ class Main {
         this.stats.end();
     }
 
-
     /**
      * Bounce/send an object off by distance 
      * @param {THREE.Vector3} cameraDirection 
@@ -250,6 +247,7 @@ class Main {
             setTimeout(() => { object.translateOnAxis(cameraDirection, 5); }, i * 10); // Move the object each 10 ms
         }
     }
+
     /**
      * Defines the function of windowResizing
      */
@@ -297,7 +295,5 @@ class Main {
         }
     }
 }
-
-
 
 var game = new Main();

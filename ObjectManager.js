@@ -227,7 +227,7 @@ export class ObjectManager {
         object.mesh.position.copy(position);
     }
 
-    /** Add blending for the objects */
+    /** Add blending for the objects as our other rasterization technique. */
     blend() {
         this.objects.forEach(function (object) {
             object.mesh.material.blending = THREE.CustomBlending;
