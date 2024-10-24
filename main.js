@@ -32,6 +32,7 @@ class Main {
             this.guiCanvas = document.querySelector('#guiCanvas');
             this.guiContainer = document.querySelector('.gui-container');
             this.gameStarted = true;
+            /** Sound by drmseq on Pixabay: https://pixabay.com/music/video-games-space-station-247790/ */
             this.playSound('assets/sounds/space-station-247790.mp3');
 
             if (this.guiCanvas && this.guiContainer) {

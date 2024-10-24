@@ -190,7 +190,7 @@ export class ObjectManager {
                     // move the objects back by a number between 200 and 900
                     object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(200, 900));
                 }
-                if (object.mesh.position.x > this.camera.position.x + 50) {
+                if (object.mesh.position.x > this.camera.position.x + 200) {
                     // move the objects back by a number between 200 and 900
                     object.mesh.position.x += (this.camera.position.x - THREE.MathUtils.randInt(200, 900));
                 }
