@@ -13,7 +13,6 @@ export class ObjectManager {
         this.scene = scene;
         this.camera = camera;
         this.objects = [];
-        this.scaleFactors = [];
         // number of objects that will get generated 
         this.objectsMax = 300;
         // call our createObjectPool function to create an objectPool 
@@ -31,7 +30,6 @@ export class ObjectManager {
             randomObject.boundingBox = new THREE.Box3().setFromObject(randomObject.mesh);
             // add objects to the objectPool
             this.objects.push(randomObject);
-            this.scaleFactors.push([1, 1, 1]);
             this.scene.add(randomObject.mesh);
         }
         //call the random position function our list of objects
@@ -58,6 +56,7 @@ export class ObjectManager {
         axis.y += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
         axis.z += THREE.MathUtils.randInt(7, 10) * Math.sign(Math.random() - 0.5);
 
+        // Json to make working with the object easier
         var object = {
             mesh: shape,
             // Which movement to apply
@@ -78,7 +77,7 @@ export class ObjectManager {
             rotationY: Math.sign(Math.random() - 0.5),
             rotationZ: Math.sign(Math.random() - 0.5),
             // Axis that it will orbit around
-            parallelAxis: axis,
+            parallelAxis: axis
         }
         return object;
     }
@@ -98,43 +97,6 @@ export class ObjectManager {
         */
         return geometries[Math.floor(Math.random() * geometries.length)]
     }
-    // https://discourse.threejs.org/t/space-background/49885
-    // source for this code which will be used temporarily 
-    renderStars() {
-        // -- space background ------------------------------------------------------
-        for (var i = 0; i < 10000; i++) {  // Adjust the number of stars if needed
-            let x = THREE.MathUtils.randFloatSpread(2000); // random position for x-axis
-            let y = THREE.MathUtils.randFloatSpread(2000); // random position for y-axis
-            let z = THREE.MathUtils.randFloatSpread(2000); // random position for z-axis
-
-            var starGeometry = new THREE.OctahedronGeometry(0.5, 0);
-
-            // Uniforms to pass to the fragment shader.
-            var starUniforms = {
-                fColor: { type: "v3", value: new THREE.Vector3(1.0, 1.0, 1.0) },
-                delta: { value: 0 }
-            }; // fColor: white color
-
-            // Create a shader material for each star
-            this.starMaterial = new THREE.ShaderMaterial(
-                {
-                    uniforms: starUniforms,
-                    fragmentShader: document.getElementById('fragmentShader').textContent
-                }
-            );
-            //var starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-            // Create a mesh by combining the geometry and material
-            var star = new THREE.Mesh(starGeometry, this.starMaterial);
-
-            // Set the position of the star randomly in 3D space
-            star.position.set(x, y, z);
-
-            // Add the star to the scene
-            this.scene.add(star);
-        }
-    }
-
 
     /**
      * A function to "spawn" the objects with a random location without intersecting 
@@ -197,31 +159,11 @@ export class ObjectManager {
                 if (object.mesh.position.y > this.camera.position.y + 200) {
                     // move the objects back by a number between 200 and 900
                     object.mesh.position.y += (this.camera.position.y - THREE.MathUtils.randInt(200, 900));
+
                 }
             }
         }
     }
-
-    /**
-     * Generates random uniform values.
-     * @returns a random uniform value
-     */
-    randomUniforms() {
-        var uniform = {
-            // The difference in coordinates
-            deltaX: { value: 0 },
-            deltaY: { value: 0 },
-            deltaZ: { value: 0 },
-            // The direction and speed that the shape will move on the axis
-            directionX: { value: (Math.random() - 0.5) / 5 },
-            directionY: { value: (Math.random() - 0.5) / 5 },
-            directionZ: { value: (Math.random() - 0.5) / 5 },
-            // The color of the shape
-            color: { value: new THREE.Color(Math.random(), Math.random(), Math.random()) }
-        };
-        return uniform;
-    }
-
 
     // Calls the functions to move the object if they apply
     animate(deltaTime) {

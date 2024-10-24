@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { ObjectManager } from './ObjectManager.js';
+import { Stars } from './Stars.js';
 import { FirstPersonControls } from './controls/FirstPersonControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module';
@@ -75,6 +76,7 @@ class Main {
                 background: 0x373737
             }
         ];
+
         // Creating the cameras
         for (let i = 0; i < this.views.length; i++) {
             const view = this.views[i];
@@ -92,11 +94,14 @@ class Main {
         // Moving the camera to a desired intial position
         this.views[0].camera.translateZ(200);
 
-        // this.controls = new OrbitControls(this.views[0].camera, this.renderer.domElement);
+        // Manages movement of the mouse
         this.controls = new FirstPersonControls(this.views[0].camera, this.renderer.domElement);
 
-        // creating a new objectManager object 
+        // Creating a new objectManager object 
         this.ObjectManager = new ObjectManager(this.scene, this.views[0].camera);
+
+        //
+        this.StarsBackground = new Stars(this.scene, this.views[0].camera);
 
         // Enable blending
         this.ObjectManager.blend();
@@ -108,7 +113,6 @@ class Main {
         // Create a raycaster to detect collisions with objects
         this.raycaster = new THREE.Raycaster();
 
-        this.ObjectManager.renderStars();
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(this.ambientLight);
 
@@ -117,8 +121,8 @@ class Main {
         this.directionalLight.castShadow = true;
         this.scene.add(this.directionalLight);
 
-        window.addEventListener('resize', () => this.onWindowResize(), false);
 
+        // Fps reporter
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
@@ -129,7 +133,6 @@ class Main {
          * 
          * "Fancy Victorian Square Picture Frame" (https://skfb.ly/6ZIHt) by Jamie McFarlane is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
         */
-
         this.loader = new GLTFLoader();
         // load in the model from the assets folder
         this.loader.load(
@@ -146,6 +149,10 @@ class Main {
             }
         )
 
+
+        // Handles window resize
+        window.addEventListener('resize', () => this.onWindowResize(), false);
+
         this.paused = false;
     }
 
@@ -159,10 +166,14 @@ class Main {
             return;
         }
 
+        // Fps reporter
         this.stats.begin();
 
-        // Updating the camera and renderer
+        // Time difference between animate calls
         const deltaTime = this.clock.getDelta();
+
+        // Move the camera at a slow, forward steady velocity using delta time
+        this.controls.update(this.cameraSpeed * deltaTime);
 
         // Create a point from the main camera looking straight
         this.pointer = new THREE.Vector3(0, 0, 1);
@@ -177,8 +188,10 @@ class Main {
         // Check each object for collision with the plane (the camera)
         for (let i = 0; i < intersects.length; i++) {
 
-            // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera
-            if (intersects[i].distance > 5 && intersects[i].distance < 10) {
+
+            // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera and 
+            // that it's not colliding wiht a star
+            if (intersects[i].distance > 1 && intersects[i].distance < 10 && !intersects[i].object.isPoints) {
 
                 // Getting the camera look at direction
                 this.views[0].camera.getWorldDirection(direction);
@@ -190,10 +203,14 @@ class Main {
 
         }
 
-        // Move the camera at a slow, forward steady velocity using delta time
-        this.controls.update(deltaTime * this.cameraSpeed);
-
+        // Moving the objects
         this.ObjectManager.animate(deltaTime);
+
+        // Keeps the backgroudn in constant movement
+        this.StarsBackground.update();
+
+        // Makes it feel like an "infinity" amount of objects
+        this.ObjectManager.loopObjects(this.ObjectManager.objects);
 
         // Updating camera and renderer
         for (let i = 0; i < this.views.length; i++) {
@@ -214,7 +231,7 @@ class Main {
             this.renderer.render(this.scene, camera);
         }
 
-        this.ObjectManager.loopObjects(this.ObjectManager.objects);
+        // Fps reporter
         this.stats.end();
     }
 
