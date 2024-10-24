@@ -146,11 +146,19 @@ export class ObjectManager {
             var object = objects[i];
 
             // if the object is within a certain distance from the camera send it back or forward by some amt
-            if (Math.random() < 0.1) { // 20% chance to be  relocated
+            if (Math.random() < 0.7) { // 70% chance to be  relocated
                 // if the position of the object is within 200 units behind the camera
                 if (object.mesh.position.z > this.camera.position.z + 200) {
-                    // move the objects back by a number between 500 and 1000
-                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(500, 1000));
+                    // move the objects back by a number between 200 and 900
+                    object.mesh.position.z += (this.camera.position.z - THREE.MathUtils.randInt(200, 900));
+                }
+                if (object.mesh.position.x > this.camera.position.x + 200) {
+                    // move the objects back by a number between 200 and 900
+                    object.mesh.position.x += (this.camera.position.x - THREE.MathUtils.randInt(200, 900));
+                }
+                if (object.mesh.position.y > this.camera.position.y + 200) {
+                    // move the objects back by a number between 200 and 900
+                    object.mesh.position.y += (this.camera.position.y - THREE.MathUtils.randInt(200, 900));
 
                 }
             }

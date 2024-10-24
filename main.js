@@ -12,17 +12,46 @@ class Main {
     constructor() {
         // adding scene, camera, renderer, making necessary adjustments
         this.scene = new THREE.Scene();
+        this.gameStarted = false;
 
         // Setting up the renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.animate());
-        // nice gray color to start with :)
         this.renderer.setClearColor(0x272727);
         this.renderer.setScissorTest(true);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.BasicShadowMap;
-        document.body.appendChild(this.renderer.domElement);
+        document.getElementById('canvas').appendChild(this.renderer.domElement);
+        // Added a start button that allows the GUI canvas to be disabled once the game starts
+        this.startButton = document.getElementById('startButton');
+        // Pause menu for when the user presses escape
+        this.pauseMenu = document.getElementById('pauseMenu');
+        // Button to allow them to return to the game
+        this.resumeButton = document.getElementById('resumeButton');
+        this.startButton.addEventListener('click', () => {
+            this.guiCanvas = document.querySelector('#guiCanvas');
+            this.guiContainer = document.querySelector('.gui-container');
+            this.gameStarted = true;
+            /** Sound by drmseq on Pixabay: https://pixabay.com/music/video-games-space-station-247790/ */
+            this.playSound('assets/sounds/space-station-247790.mp3');
+
+            if (this.guiCanvas && this.guiContainer) {
+                this.guiCanvas.style.display = 'none';
+                this.guiContainer.style.display = 'none';
+            }
+
+        });
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                this.togglePause();
+            }
+        });
+
+        this.resumeButton.addEventListener('click', () => {
+            this.togglePause();
+        });
 
         // Object with the required information for each camera
         this.views = [
@@ -97,7 +126,7 @@ class Main {
         this.stats = Stats()
         this.stats.showPanel(0)
         document.body.appendChild(this.stats.dom)
-
+        
         /*"Cockpit Model Vr" (https://skfb.ly/6QTwx) by chiefpad 
          * is licensed under Creative Commons Attribution 
          * (http://creativecommons.org/licenses/by/4.0/). 
@@ -120,14 +149,23 @@ class Main {
             }
         )
 
+
         // Handles window resize
         window.addEventListener('resize', () => this.onWindowResize(), false);
+
+        this.paused = false;
     }
 
     /**
      * Move the camera, check for collision.
      */
     animate() {
+        // Flag to return if the game is not in the started state
+        if (!this.gameStarted || this.paused) {
+            this.stats.end();
+            return;
+        }
+
         // Fps reporter
         this.stats.begin();
 
@@ -149,6 +187,7 @@ class Main {
 
         // Check each object for collision with the plane (the camera)
         for (let i = 0; i < intersects.length; i++) {
+
 
             // Check if the object is close enough to the ray to consider it colliding, excluding the rear-view camera and 
             // that it's not colliding wiht a star
@@ -212,7 +251,7 @@ class Main {
         }
     }
     /**
-     * defines the function of windowResizing
+     * Defines the function of windowResizing
      */
     onWindowResize() {
         this.views.forEach(function (view) {
@@ -239,12 +278,26 @@ class Main {
         audioLoader.load(audioFile, function (buffer) {
             sound.setBuffer(buffer);
             sound.setLoop(false);
-            sound.setVolume(0.5);
+            sound.setVolume(0.3);
             sound.play();
-            sound.stop(2); // Stop after 2 seconds
+            sound.stop(57);
 
         });
     }
+
+    /**
+     * Function to toggle pausing for users
+     */
+    togglePause() {
+        this.paused = !this.paused;
+        if (this.paused) {
+            this.pauseMenu.style.display = 'flex';  // Show pause menu
+        } else {
+            this.pauseMenu.style.display = 'none';  // Hide pause menu
+        }
+    }
 }
+
+
 
 var game = new Main();
