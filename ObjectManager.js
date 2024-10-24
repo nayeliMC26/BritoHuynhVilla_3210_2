@@ -185,9 +185,9 @@ export class ObjectManager {
 
     // Moves the object in a linear dirrection
     linear(object, deltaTime) {
-        object.mesh.translateX(object.deltaX * deltaTime);
-        object.mesh.translateY(object.deltaY * deltaTime);
-        object.mesh.translateZ(object.deltaZ * deltaTime);
+        object.mesh.translateX(object.deltaX * deltaTime / 5);
+        object.mesh.translateY(object.deltaY * deltaTime / 5);
+        object.mesh.translateZ(object.deltaZ * deltaTime / 5);
     }
 
     // Rotates the object in place
@@ -199,7 +199,7 @@ export class ObjectManager {
 
     // Rotates the object on an axis
     orbit(object, deltaTime) {
-        this.rotateAboutWorldAxis(object.mesh, object.parallelAxis, object.deltaX * deltaTime / 2);
+        this.rotateAboutWorldAxis(object.mesh, object.parallelAxis, object.deltaX * deltaTime / 5);
     }
 
     // Changes the size of the object on the x, y, and z axis on a sin pattern
