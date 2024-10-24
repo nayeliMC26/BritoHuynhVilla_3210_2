@@ -136,7 +136,7 @@ export class ObjectManager {
     }
 
     /**
-     * 
+     * Iterate over the objects in the objectPool.
      * @param {*} objects 
      */
     loopObjects(objects) {
@@ -183,7 +183,7 @@ export class ObjectManager {
         });
     }
 
-    // Moves the object in a linear dirrection
+    // Moves the object in a linear direction
     linear(object, deltaTime) {
         object.mesh.translateX(object.deltaX * deltaTime / 5);
         object.mesh.translateY(object.deltaY * deltaTime / 5);
@@ -206,7 +206,7 @@ export class ObjectManager {
     scale(object, deltaTime) {
         // Make a copy of the object's original position
         var position = object.mesh.position.clone();
-        // Moving object to origing for easier scaling
+        // Moving object to origin for easier scaling
         object.mesh.position.copy(0, 0, 0);
 
         // Reverting object to the original size
